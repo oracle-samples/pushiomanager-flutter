@@ -59,9 +59,9 @@ Add the following dependency to your `pubspec.yaml`,
 
 ```yaml
 dependencies:
-	pushiomanager_flutter:
-  		git:
-  			url: https://github.com/oracle-samples/pushiomanager_flutter.git
+pushiomanager_flutter:
+  	git:
+  		url: https://github.com/oracle-samples/pushiomanager_flutter.git
 ```
 
 and run `flutter pub get` from command-line.
