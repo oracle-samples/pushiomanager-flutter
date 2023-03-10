@@ -61,7 +61,7 @@ Add the following dependency to your `pubspec.yaml`,
 dependencies:
 pushiomanager_flutter:
   	git:
-  		url: https://github.com/oracle-samples/pushiomanager_flutter.git
+  		url: https://github.com/oracle-samples/pushiomanager-flutter.git
 ```
 
 and run `flutter pub get` from command-line.
