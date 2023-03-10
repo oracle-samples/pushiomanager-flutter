@@ -1,0 +1,41 @@
+// Copyright © 2023, Oracle and/or its affiliates. All rights reserved.
+// Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
+
+group 'com.pushio.manager.flutter'
+version '6.54.0'
+
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:4.1.0'
+    }
+}
+
+rootProject.allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+apply plugin: 'com.android.library'
+
+dependencies {
+    compileOnly 'com.google.firebase:firebase-messaging:18.0.0'
+    implementation rootProject.files('app/libs/PushIOManager-6.54.1.aar')
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
+    implementation 'com.android.support:support-annotations:28.0.0'
+    implementation 'org.jetbrains:annotations:15.0'
+}
+
+android {
+    compileSdkVersion 31
+
+    defaultConfig {
+        minSdkVersion 21
+    }
+}

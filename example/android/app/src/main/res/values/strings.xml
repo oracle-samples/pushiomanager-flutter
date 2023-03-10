@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Flutter Sample App</string>
+    <string name="app_links_url_host">rsp.qa1.responsys.net</string>
+    <string name="uri_identifier">pio-ABErcWPfJPhgWHFaVoDEk3hrU</string>
+</resources>
