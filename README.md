@@ -33,7 +33,7 @@ This plugin makes it easy to integrate the Responsys Mobile SDK with your Flutte
 - Android SDK Tools >= 28.0.3
 
 ### For iOS
-- iOS 11 or later
+- iOS 12 or later
 
 ## Setup
 
@@ -50,8 +50,8 @@ Before installing the plugin, you must setup your app to receive push notificati
 - [Generate Auth Key](https://docs.oracle.com/en/cloud/saas/marketing/responsys-develop-mobile/ios/auth-key/) 
 - Log in to the [Responsys Mobile App Developer Console](https://docs.oracle.com/en/cloud/saas/marketing/responsys-develop-mobile/dev-console/login/) and enter your Auth Key and other details for your iOS app.
 - Download the `pushio_config.json` file generated from your credentials.
-- After adding the plugin in your app, copy `PushIOManager.framework` and place it in the plugin ios directory - `pushiomanager-flutter/ios/`. 
-- Run `pod install` in the `your_app_directory/ios/` directory, after adding the plugin in to your app and copying `PushIOManager.framework` in  `pushiomanager-flutter/ios/` directory. 
+- After adding the plugin in your app, copy `PushIOManager.xcframework` and place it in the plugin ios directory - `pushiomanager-flutter/ios/`. 
+- Run `pod install` in the `your_app_directory/ios/` directory, after adding the plugin in to your app and copying `PushIOManager.xcframework` in  `pushiomanager-flutter/ios/` directory. 
 
 ## Installation
 
