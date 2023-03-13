@@ -156,9 +156,6 @@ and run `flutter pub get` from command-line.
 ### For iOS
 - Open the **Xcode project workspace** in your `ios` directory of flutter app. 
 - Drag and Drop your `pushio_config.json` in Xcode project.
-- Go to build settings of your app project (not target) and search for other linker flags.
-- Enter `-ObjC -all_load`. Please check below image.
-![Other linker Image](./img/05-obcj_linker_switch_entered.png "Other linker flags")
 - Select the root project and Under Capabilites add the "Push Notifications" and "Background Modes". 
 ![Capability Image](./img/ios_add_capability.png "Capabilty Image")
 - For In-App Messages and Rich Push Content follow the below steps :
