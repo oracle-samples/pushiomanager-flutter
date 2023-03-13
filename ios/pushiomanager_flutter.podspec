@@ -16,9 +16,9 @@ Pod::Spec.new do |s|
   s.source_files = 'Classes/**/*'
   s.public_header_files = 'Classes/**/*.h'
   s.dependency 'Flutter'
-  s.platform = :ios, '11.0'
+  s.platform = :ios, '12.0'
   s.preserve_paths = 'PushIOManager.xcframework'
-  s.xcconfig = { 'OTHER_LDFLAGS' => '-framework PushIOManager' }
+  s.xcconfig = { 'OTHER_LDFLAGS' => '-framework PushIOManager -ObjC' }
   s.vendored_frameworks = 'PushIOManager.xcframework'
   s.preserve_paths 	  = "PushIOManager.xcframework/**/*"
   s.libraries               = 'sqlite3'
@@ -26,5 +26,5 @@ Pod::Spec.new do |s|
   s.ios.frameworks          = 'WebKit'
 
   # Flutter.framework does not contain a i386 slice.
-  s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386 arm64' }
+  s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386 arm64','OTHER_LDFLAGS' => '-ObjC' }
 end
