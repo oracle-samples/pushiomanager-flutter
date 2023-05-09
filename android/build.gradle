@@ -2,7 +2,7 @@
 // Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
 
 group 'com.pushio.manager.flutter'
-version '6.54.0'
+version '6.54.1'
 
 buildscript {
     repositories {
@@ -11,7 +11,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.0'
+        classpath 'com.android.tools.build:gradle:7.4.2'
     }
 }
 
@@ -26,7 +26,7 @@ apply plugin: 'com.android.library'
 
 dependencies {
     compileOnly 'com.google.firebase:firebase-messaging:18.0.0'
-    implementation rootProject.files('app/libs/PushIOManager-6.54.1.aar')
+    implementation project(":PushIOManager")
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     implementation 'com.android.support:support-annotations:28.0.0'
     implementation 'org.jetbrains:annotations:15.0'
@@ -37,5 +37,6 @@ android {
 
     defaultConfig {
         minSdkVersion 21
+        targetSdkVersion 31
     }
 }

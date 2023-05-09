@@ -37,7 +37,7 @@ enum EngagementType {
 enum LogLevel { NONE, ERROR, WARN, INFO, DEBUG, VERBOSE }
 
 class PushIOManager {
-  static MethodChannel _channel = MethodChannel('pushiomanager_flutter');
+  static MethodChannel _channel = new MethodChannel('pushiomanager_flutter');
   static NotificationDeepLinkHandler _notificationDeepLinkHandler;
   static AppOpenLinkHandler _appOpenLinkHandler;
   static InAppMessageUrlResolveLinkHandler _inAppMessageUrlResolveLinkHandler;
@@ -335,7 +335,8 @@ class PushIOManager {
   }
 
   static Future<void> resetBadgeCount({bool forceSetBadge: false}) async {
-    return await _channel.invokeMethod('resetBadgeCount', forceSetBadge);
+    return await _channel
+        .invokeMethod('resetBadgeCount', {'forceSetBadge': forceSetBadge});
   }
 
   static Future<void> resetMessageCenter() async {
@@ -515,7 +516,6 @@ class PushIOManager {
       shared = PushIOManager();
     }
     _inAppMessageUrlResolveLinkHandler = handler;
-    // _channel.invokeMethod('setExecuteRsysWebUrl', handler != null);
   }
 
   static void setNotificationDeepLinkHandler(
@@ -524,7 +524,6 @@ class PushIOManager {
       shared = PushIOManager();
     }
     _notificationDeepLinkHandler = handler;
-    // _channel.invokeMethod('setInterceptDeepLink', handler != null);
   }
 
   static void setAppOpenLinkHandler(AppOpenLinkHandler handler) {
@@ -532,7 +531,6 @@ class PushIOManager {
       shared = PushIOManager();
     }
     _appOpenLinkHandler = handler;
-    // _channel.invokeMethod('setInterceptAppOpenLink', handler != null);
   }
 
   Future<void> _handleNativeCallbacks(MethodCall call) async {
