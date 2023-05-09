@@ -25,12 +25,12 @@ apply plugin: 'com.android.application'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
-    compileSdkVersion 33
+    compileSdkVersion 31
 
     defaultConfig {
         applicationId "com.pushio.flutter.sample"
         minSdkVersion 21
-        targetSdkVersion 33
+        targetSdkVersion 31
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
@@ -41,12 +41,15 @@ android {
             minifyEnabled false
         }
     }
-    namespace 'com.pushio.flutter.sample'
 
     android.applicationVariants.all { variant ->
         variant.outputs.all {
             outputFileName = "pushio-ri-sample-flutter-${defaultConfig.versionName}.apk"
         }
+    }
+
+    if (project.android.hasProperty("namespace")) {
+        namespace 'com.pushio.flutter.sample'
     }
 }
 
