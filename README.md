@@ -33,7 +33,7 @@ This plugin makes it easy to integrate the Responsys Mobile SDK with your Flutte
 - Android SDK Tools >= 28.0.3
 
 ### For iOS
-- iOS 11 or later
+- iOS 12 or later
 
 ## Setup
 
@@ -50,8 +50,8 @@ Before installing the plugin, you must setup your app to receive push notificati
 - [Generate Auth Key](https://docs.oracle.com/en/cloud/saas/marketing/responsys-develop-mobile/ios/auth-key/) 
 - Log in to the [Responsys Mobile App Developer Console](https://docs.oracle.com/en/cloud/saas/marketing/responsys-develop-mobile/dev-console/login/) and enter your Auth Key and other details for your iOS app.
 - Download the `pushio_config.json` file generated from your credentials.
-- After adding the plugin in your app, copy `PushIOManager.framework` and place it in the plugin ios directory - `pushiomanager-flutter/ios/`. 
-- Run `pod install` in the `your_app_directory/ios/` directory, after adding the plugin in to your app and copying `PushIOManager.framework` in  `pushiomanager-flutter/ios/` directory. 
+- After adding the plugin in your app, copy `PushIOManager.xcframework` and place it in the plugin ios directory - `pushiomanager-flutter/ios/`. 
+- Run `pod install` in the `your_app_directory/ios/` directory, after adding the plugin in to your app and copying `PushIOManager.xcframework` in  `pushiomanager-flutter/ios/` directory. 
 
 ## Installation
 
@@ -59,9 +59,9 @@ Add the following dependency to your `pubspec.yaml`,
 
 ```yaml
 dependencies:
-	pushiomanager_flutter:
-  		git:
-  			url: https://github.com/oracle-samples/pushiomanager_flutter.git
+pushiomanager_flutter:
+  	git:
+  		url: https://github.com/oracle-samples/pushiomanager-flutter.git
 ```
 
 and run `flutter pub get` from command-line.
@@ -156,9 +156,6 @@ and run `flutter pub get` from command-line.
 ### For iOS
 - Open the **Xcode project workspace** in your `ios` directory of flutter app. 
 - Drag and Drop your `pushio_config.json` in Xcode project.
-- Go to build settings of your app project (not target) and search for other linker flags.
-- Enter `-ObjC -all_load`. Please check below image.
-![Other linker Image](./img/05-obcj_linker_switch_entered.png "Other linker flags")
 - Select the root project and Under Capabilites add the "Push Notifications" and "Background Modes". 
 ![Capability Image](./img/ios_add_capability.png "Capabilty Image")
 - For In-App Messages and Rich Push Content follow the below steps :
@@ -322,6 +319,14 @@ Do not use this as a persistent (key/value) store since this data is purgeable.
 ## Support
 
 If you have access to My Oracle Support, please raise a request [here](http://support.oracle.com/), otherwise open an issue in this repository. 
+
+Please consult the [security guide](./SECURITY.md) for our responsible security vulnerability disclosure process
+
+## Contributing
+
+This project welcomes contributions from the community. Before submitting a pull request, please [review our contribution guide](./CONTRIBUTING.md)
+
+## Security
 
 Please consult the [security guide](./SECURITY.md) for our responsible security vulnerability disclosure process
 

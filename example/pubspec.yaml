@@ -29,7 +29,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   visibility_detector: ^0.2.0
   pushiomanager_flutter:
-    path: ..
+    git: https://github.com/oracle-samples/pushiomanager-flutter.git
 
 dev_dependencies:
   flutter_test:
