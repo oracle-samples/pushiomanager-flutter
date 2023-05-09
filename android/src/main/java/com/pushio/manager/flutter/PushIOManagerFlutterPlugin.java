@@ -320,6 +320,9 @@ public class PushIOManagerFlutterPlugin implements FlutterPlugin, MethodCallHand
                 mPushIOManager.setPreference(key, (Long) value);
             } else if (value instanceof Double) {
                 mPushIOManager.setPreference(key, (Double) value);
+            }else{
+                result.error("Not a Number", null, null);
+                return;
             }
 
             result.success(null);
@@ -446,16 +449,21 @@ public class PushIOManagerFlutterPlugin implements FlutterPlugin, MethodCallHand
         mPushIOManager.registerPushIOListener(new PushIOListener() {
             @Override
             public void onPushIOSuccess() {
+                mPushIOManager.registerPushIOListener(null);
+
                 mUIThreadHandler.post(new Runnable() {
                     @Override
                     public void run() {
                         result.success(null);
                     }
                 });
+
             }
 
             @Override
             public void onPushIOError(final String errorReason) {
+                mPushIOManager.registerPushIOListener(null);
+
                 mUIThreadHandler.post(new Runnable() {
                     @Override
                     public void run() {
@@ -590,7 +598,7 @@ public class PushIOManagerFlutterPlugin implements FlutterPlugin, MethodCallHand
         result.success(mPushIOManager.getBadgeCount());
     }
 
-    private void resetBadgeCount(MethodCall call, final Result result) {
+    private void resetBadgeCount(MethodCall call, Result result) {
         boolean forceSetBadge = false;
 
         if (call.hasArgument("forceSetBadge")) {
