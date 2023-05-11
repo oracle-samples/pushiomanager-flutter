@@ -598,7 +598,7 @@ public class PushIOManagerFlutterPlugin implements FlutterPlugin, MethodCallHand
         result.success(mPushIOManager.getBadgeCount());
     }
 
-    private void resetBadgeCount(MethodCall call, Result result) {
+    private void resetBadgeCount(MethodCall call, final Result result) {
         boolean forceSetBadge = false;
 
         if (call.hasArgument("forceSetBadge")) {
