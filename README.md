@@ -21,6 +21,7 @@ This plugin makes it easy to integrate the Responsys Mobile SDK with your Flutte
   * [Message Center](#message-center)
   * [Geofences And Beacons](#geofences-and-beacons)
   * [Notification Preferences](#notification-preferences)
+  * [Handling Deeplink](#handling-deeplink)
 - [Support](#support)
 - [License](#license)
 
@@ -64,8 +65,10 @@ Before installing the plugin, you must setup your app to receive push notificati
 - [Generate Auth Key](https://docs.oracle.com/en/cloud/saas/marketing/responsys-develop-mobile/ios/auth-key/) 
 - Log in to the [Responsys Mobile App Developer Console](https://docs.oracle.com/en/cloud/saas/marketing/responsys-develop-mobile/dev-console/login/) and enter your Auth Key and other details for your iOS app.
 - Download the `pushio_config.json` file generated from your credentials.
+- Download the SDK binary from [here](https://www.oracle.com/downloads/applications/cx/responsys-mobile-sdk.html).
 - After adding the plugin in your app, copy `PushIOManager.xcframework` and place it in the plugin ios directory - `pushiomanager-flutter/ios/`. 
 - Run `pod install` in the `your_app_directory/ios/` directory, after adding the plugin in to your app and copying `PushIOManager.xcframework` in  `pushiomanager-flutter/ios/` directory. 
+![framework Image](./img/ios_framework.png "framework Image")
 
 ## Installation
 
@@ -171,7 +174,7 @@ and run `flutter pub get` from command-line.
 - Open the **Xcode project workspace** in your `ios` directory of flutter app. 
 - Drag and Drop your `pushio_config.json` in Xcode project.
 - Select the root project and Under Capabilites add the "Push Notifications" and "Background Modes". 
-![Capability Image](./img/ios_add_capability.png "Capabilty Image")
+![Capability Image](./img/ios_config_file.png "Capabilty Image")
 - For In-App Messages and Rich Push Content follow the below steps :
   * To Enable Custom URI scheme for displaying In-App Messages and Rich Push content follow the [Step 1](https://docs.oracle.com/en/cloud/saas/marketing/responsys-develop-mobile/ios/in-app-msg/). You don't need to add the code.
   You can find the API key in the `pushio_config.json` that was placed in your Xcode project earlier during setup.
@@ -328,6 +331,47 @@ Preferences are used to record user-choices for push notifications. The preferen
 	```
 	
 Do not use this as a persistent (key/value) store since this data is purgeable.
+
+### Handling Deeplink
+
+When the user taps on a push notification (having a deeplink), the plugin passes the deeplink to the app.
+
+#### For iOS
+
+By Default, Plugin open Deeplink url in browser.Your app must implement the following native code for default handling of Deeplink url. 
+Ensure that you have implemented `openURL` method in your `AppDelegate.m`, as follows,
+
+```objective-c
+- (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
+
+	[[PushIOManager sharedInstance] openURL:url options:options];
+	
+  return YES;
+}
+```
+ or
+
+Refer this [intercepting-deeplink](https://docs.oracle.com/en/cloud/saas/marketing/responsys-develop-mobile/ios/intercepting-deeplink.htm) to handle Deeplink URL in iOS Native code.
+ 
+#### Dart Code
+
+To handle Deeplink url in dart code, Implement the following code
+
+```dart
+PushIOManager.setInterceptDeepLink(true);
+```
+
+Once 'InterceptDeeplink' is set, Deeplink is recieved in following code
+
+```dart
+PushIOManager.setNotificationDeepLinkHandler((String url) {
+        print("DeepLink: $url");
+})
+.then((_) =>)
+.catchError((error) => print("DeepLink url is not present: $error"));
+
+```
+
 
 
 ## Support
