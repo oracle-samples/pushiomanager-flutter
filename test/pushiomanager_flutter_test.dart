@@ -12,7 +12,13 @@ void main() {
 
   setUp(() {
     channel.setMockMethodCallHandler((MethodCall methodCall) async {
-      return '42';
+      if (methodCall.method == 'getPlatformVersion') {
+        return PushIOManager.getLibVersion();
+      } else if (methodCall.method == 'getAPIKey') {
+        return null;
+      } else {
+        return null;
+      }
     });
   });
 
@@ -22,5 +28,21 @@ void main() {
 
   test('getPlatformVersion', () async {
     expect(await PushIOManager.getLibVersion(), '6.48');
+  });
+
+  test('getAPIKey', () async {
+    expect(await PushIOManager.getAPIKey(), null);
+  });
+
+  test('getAccountToken', () async {
+    expect(await PushIOManager.getAccountToken(), null);
+  });
+
+  test('getPreferences', () async {
+    expect(await PushIOManager.getPreferences(), null);
+  });
+
+  test('getPreference', () async {
+    expect(await PushIOManager.getPreference("key"), null);
   });
 }

@@ -2,8 +2,8 @@
 // Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
 
 class InteractiveNotificationCategory {
-  String category;
-  List<InteractiveNotificationButton> notificationButtons;
+  String? category;
+  List<InteractiveNotificationButton>? notificationButtons;
 
   InteractiveNotificationCategory(this.category, this.notificationButtons);
 
@@ -17,14 +17,14 @@ class InteractiveNotificationCategory {
 
   Map<String, dynamic> toJson() => {
         'orcl_category': category,
-        'orcl_btns': notificationButtons.map((e) => e.toJson()).toList()
+        'orcl_btns': notificationButtons!.map((e) => e.toJson()).toList()
       };
 }
 
 class InteractiveNotificationButton {
-  String id;
-  String action;
-  String label;
+  String? id;
+  String? action;
+  String? label;
 
   InteractiveNotificationButton(this.id, this.action, this.label);
 

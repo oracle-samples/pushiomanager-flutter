@@ -22,11 +22,18 @@ static PushIOManagerFlutterPlugin *sharedInstance = nil;
 static dispatch_once_t onceToken;
 dispatch_once(&onceToken, ^{
     sharedInstance = [PushIOManagerFlutterPlugin new];
+    [sharedInstance setUpDeeplinkHandler];
 });
 return sharedInstance;
 }
 
+-(void) setUpDeeplinkHandler {
     
+   BOOL isDeepLinkHandlerSet=  [[NSUserDefaults standardUserDefaults] boolForKey:@"PIODeeplinkHandler"];
+    if(isDeepLinkHandlerSet) {
+        [[PushIOManager sharedInstance] setDeeplinkDelegate:self];
+    }
+}
     
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
     FlutterMethodChannel* flutterChannel = [FlutterMethodChannel
@@ -487,7 +494,7 @@ return sharedInstance;
 
 
 -(void)getPreferences:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    NSArray *preference = [[[PushIOManager sharedInstance] getPreferences] preferencesDictionary];
+    NSString *preference = [[[[PushIOManager sharedInstance] getPreferences] preferencesDictionary] JSON];
     result(preference);
 }
 
@@ -498,8 +505,13 @@ return sharedInstance;
     }
 
     PIOPreference *preference = [[PushIOManager sharedInstance] getPreference:key];
-    NSString *prefrenceJSON = [[NSDictionary dictionaryFromPreference:preference] JSON];
-    [self sendPluginResult:result withResponse:prefrenceJSON andError:nil];
+    NSDictionary *jsonDictionary = [NSDictionary dictionaryFromPreference:preference];
+    if(jsonDictionary) {
+    NSString *prefrenceJSON = [jsonDictionary JSON];
+       [self sendPluginResult:result withResponse:prefrenceJSON andError:nil];
+    } else {
+        [self sendPluginResult:result withResponse:nil andError:nil];
+    }
 }
 
 
@@ -959,9 +971,11 @@ return sharedInstance;
 
     if ([value boolValue] == YES) {
         [[PushIOManager sharedInstance] setDeeplinkDelegate:self];
+        [[NSUserDefaults standardUserDefaults] setBool:true forKey:@"PIODeeplinkHandler"];
 
     } else {
         [[PushIOManager sharedInstance] setDeeplinkDelegate:nil];
+        [[NSUserDefaults standardUserDefaults] setBool:false forKey:@"PIODeeplinkHandler"];
 
     }
 
@@ -1069,6 +1083,18 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
 - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
     [[PushIOManager sharedInstance] openURL:url options:options];
     return YES;
+}
+
+- (BOOL)application:(UIApplication*)application
+    didFinishLaunchingWithOptions:(NSDictionary*)launchOptions {
+    
+    [[PushIOManager sharedInstance] didFinishLaunchingWithOptions:launchOptions];
+    return true;
+}
+
+- (void)applicationDidBecomeActive:(UIApplication*)application {
+    
+    [[PushIOManager sharedInstance] didFinishLaunchingWithOptions:nil];
 }
 
 -(void)setInAppMessageBannerHeight:(FlutterMethodCall *)call withResult:(FlutterResult)result {

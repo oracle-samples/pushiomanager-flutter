@@ -34,7 +34,11 @@
 - (NSArray *)notificationCategoryArray {
   NSMutableArray *categories = [NSMutableArray array];
   for (NSDictionary *category in self) {
-    [categories addObject:[category notificationCategory]];
+      PIONotificationCategory *categoryDetails = [category notificationCategory];
+      if(categoryDetails != nil) {
+          [categories addObject:categoryDetails];
+      }
+   
   }
   return categories;
 }
@@ -53,7 +57,9 @@
   NSMutableArray *preferences = [NSMutableArray array];
   for (PIOPreference *preference in self) {
     NSDictionary *dictionary = [NSDictionary dictionaryFromPreference:preference];
-    [preferences addObject:dictionary];
+      if(dictionary != nil) {
+          [preferences addObject:dictionary];
+      }
   }
         
   return preferences;
@@ -63,7 +69,7 @@
     NSError *err;
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:self options:0 error:&err];
     
-    if(err != nil) {
+    if(err != nil || jsonData == nil) {
         return nil;
     }
     

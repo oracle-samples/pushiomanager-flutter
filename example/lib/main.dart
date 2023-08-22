@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
           primaryColor: Color(0xffc53f34),
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(
-                primary: Color(0xffc53f34),
+                backgroundColor: Color(0xffc53f34),
                 shape: RoundedRectangleBorder(
                     borderRadius: new BorderRadius.circular(30.0)),
                 minimumSize: Size(250, 45)),
@@ -43,8 +43,8 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-  final String title;
+  MyHomePage({Key? key, this.title}) : super(key: key);
+  final String? title;
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -67,7 +67,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text(widget.title),
+          title: Text(widget.title!),
         ),
         body: SafeArea(
             child: SingleChildScrollView(
@@ -466,13 +466,21 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void registerApp() {
     if (Platform.isAndroid) {
-      PushIOManager.registerApp(useLocation: true)
+      PushIOManager.registerAppForPush(true, false)
           .then((_) => showToast("Registration Successful"))
           .catchError((error) {
         showToast("Registration error: $error");
       });
     } else if (Platform.isIOS) {
-      // TODO
+      PushIOManager.registerForAllRemoteNotificationTypes().then((_) {
+        PushIOManager.registerApp().then((_) {
+          showToast("App Registration Successful");
+        }).catchError((e) {
+          showToast("App Registration failed: " + e.message);
+        });
+      }).catchError((e) {
+        showToast("App Registration failed: " + e.message);
+      });
     }
   }
 
@@ -587,8 +595,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void setMessageCenterBadgeCount() {
     int badgeCount = 0;
 
-    if (badgeCountController.text != null &&
-        badgeCountController.text.isNotEmpty) {
+    if (badgeCountController.text.isNotEmpty) {
       badgeCount = int.parse(badgeCountController.text);
     }
 

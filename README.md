@@ -44,13 +44,13 @@ Before installing the plugin, you must setup your app to receive push notificati
 - [Get FCM Credentials](https://docs.oracle.com/en/cloud/saas/marketing/responsys-develop-mobile/android/gcm-credentials) 
 - Log in to the [Responsys Mobile App Developer Console](https://docs.oracle.com/en/cloud/saas/marketing/responsys-develop-mobile/dev-console/login/) and enter your FCM credentials (Project ID and Server API Key) for your Android app.
 - Get the `pushio_config.json` file generated from your credentials and place it in your project's `android/app/src/main/assets` folder. You might have to create the directory if it is not already present.
-- Download the SDK binary from [here](https://www.oracle.com/downloads/applications/cx/responsys-mobile-sdk.html). 
+- Download the latest SDK binary from [here](https://www.oracle.com/downloads/applications/cx/responsys-mobile-sdk.html). 
 - Create a new directory  - `PushIOManager` inside your app's `android` directory.
 - Inside the `android/PushIOManager` directory, create a file `build.gradle` with the following code:
 
 	```gradle
 	configurations.maybeCreate("default")
-	artifacts.add("default", file('PushIOManager-6.54.1.aar'))
+	artifacts.add("default", file('PushIOManager-6.56.1.aar'))
 	```		
 
 - Add the following to your project-wide `settings.gradle` file:
@@ -95,7 +95,7 @@ and run `flutter pub get` from command-line.
 	implementation 'com.google.firebase:firebase-messaging:18.0.0' 
 	```
 	
-	**NOTE**: If your app uses `firebase-messaging` library version 21.0.0 or later, it is required to add the following dependency as well,
+	**NOTE**: If your app uses the native `firebase-messaging` library version 21.0.0 or later, it is required to add the following dependency as well,
 	
 	```gradle
 	implementation 'com.google.android.gms:play-services-base:16.1.0' 
@@ -209,7 +209,7 @@ import 'package:pushiomanager_flutter/pushiomanager_flutter.dart';
 
    ```dart
    if (Platform.isAndroid) {
-   		PushIOManager.registerApp(useLocation: true)
+   		PushIOManager.registerAppForPush(true, false)
    			.then((_) => print("Registration Successful"))
    			.catchError((error) => print("Registration error: $error"));
   	} else if (Platform.isIOS) {
@@ -350,9 +350,32 @@ Ensure that you have implemented `openURL` method in your `AppDelegate.m`, as fo
 }
 ```
  or
-
-Refer this [intercepting-deeplink](https://docs.oracle.com/en/cloud/saas/marketing/responsys-develop-mobile/ios/intercepting-deeplink.htm) to handle Deeplink URL in iOS Native code.
  
+Refer this [intercepting-deeplink](https://docs.oracle.com/en/cloud/saas/marketing/responsys-develop-mobile/ios/intercepting-deeplink.htm) to handle Deeplink URL in iOS Native code.
+
+#### For Android
+
+- In `AndroidManifest.xml`, change the `launchMode` of `MainActivity` to `singleTask` and add the following Intent-filter,
+
+	```xml
+	<activity
+	  android:name=".MainActivity"
+	  android:launchMode="singleTask">
+	  
+	  <intent-filter>
+        <action android:name="${applicationId}.intent.action.PROCESS_RSYS_DEEPLINK" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <data android:scheme="YOUR_CUSTOM_URL_SCHEME" />
+      </intent-filter>
+	 
+	</activity>
+	```
+
+- Add the following code to your `MainActivity`,
+
+	```java
+	```
+
 #### Dart Code
 
 To handle Deeplink url in dart code, Implement the following code

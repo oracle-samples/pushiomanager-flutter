@@ -13,8 +13,9 @@ class Preference {
   Preference(this.key, this.label, this.value, this.type);
 
   static Preference fromJson(dynamic json) {
-    return Preference(json['key'], json['label'], json['value'],
-        preferenceTypeFromString(json['type']));
+    Map<String, dynamic> jsonMap = json;
+    return Preference(jsonMap['key'], jsonMap['label'], jsonMap['value'],
+        preferenceTypeFromString(jsonMap['type']));
   }
 
   Map<String, dynamic> toJson() => {

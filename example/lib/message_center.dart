@@ -6,7 +6,7 @@ import 'package:visibility_detector/visibility_detector.dart';
 class MessageCenterPage extends StatefulWidget {
   final List<MessageCenterMessage> messages;
 
-  MessageCenterPage({Key key, @required this.messages}) : super(key: key);
+  MessageCenterPage({Key? key, required this.messages}) : super(key: key);
 
   @override
   _MessageCenterPageState createState() => _MessageCenterPageState();
@@ -25,7 +25,7 @@ class _MessageCenterPageState extends State<MessageCenterPage> {
     super.dispose();
   }
 
-  static Route<Object> _dialogBuilder(BuildContext context, Object arguments) {
+  static Route<Object> _dialogBuilder(BuildContext context, Object? arguments) {
     return DialogRoute<void>(
       context: context,
       builder: (BuildContext context) => AlertDialog(
@@ -38,7 +38,7 @@ class _MessageCenterPageState extends State<MessageCenterPage> {
               child: Text("Close"))
         ],
       ),
-    );
+    ) as Route<Object>;
   }
 
   @override
@@ -64,10 +64,10 @@ class _MessageCenterPageState extends State<MessageCenterPage> {
                   child: ListTile(
                     leading: CircleAvatar(
                       backgroundImage:
-                          NetworkImage(widget.messages[index].iconURL),
+                          NetworkImage(widget.messages[index].iconURL!),
                     ),
-                    title: Text(widget.messages[index].subject),
-                    subtitle: Text(widget.messages[index].message),
+                    title: Text(widget.messages[index].subject!),
+                    subtitle: Text(widget.messages[index].message!),
                     onTap: () {
                       onMessageSelected(widget.messages[index]);
                     },
@@ -83,7 +83,7 @@ class _MessageCenterPageState extends State<MessageCenterPage> {
   }
 
   showRichContent(MessageCenterMessage message, Map<String, String> response) {
-    String richContentHtml;
+    String? richContentHtml;
     if (response['richContent'] != null) {
       richContentHtml = response['richContent'];
     } else {

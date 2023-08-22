@@ -3,16 +3,16 @@
 
 class MessageCenterMessage {
   final String messageID;
-  final String subject;
-  final String message;
-  final String iconURL;
-  final String messageCenterName;
-  final String deeplinkURL;
-  final String richMessageHTML;
-  final String richMessageURL;
-  final String sentTimestamp;
-  final String expiryTimestamp;
-  final Map<String, String> customKeyValuePairs;
+  final String? subject;
+  final String? message;
+  final String? iconURL;
+  final String? messageCenterName;
+  final String? deeplinkURL;
+  final String? richMessageHTML;
+  final String? richMessageURL;
+  final String? sentTimestamp;
+  final String? expiryTimestamp;
+  final Map<String, String>? customKeyValuePairs;
 
   MessageCenterMessage(
       this.messageID,
