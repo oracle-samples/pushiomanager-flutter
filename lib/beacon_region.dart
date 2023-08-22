@@ -2,20 +2,20 @@
 // Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
 
 class BeaconRegion {
-  final String beaconId;
-  final String beaconName;
-  final String beaconTag;
-  final String beaconProximity;
-  final String iBeaconUUID;
-  final int iBeaconMajor;
-  final int iBeaconMinor;
-  final String eddyStoneId1;
-  final String eddyStoneId2;
-  final String zoneName;
-  final String zoneId;
-  final String source;
-  final int dwellTime;
-  final Map<String, String> extra;
+  final String? beaconId;
+  final String? beaconName;
+  final String? beaconTag;
+  final String? beaconProximity;
+  final String? iBeaconUUID;
+  final int? iBeaconMajor;
+  final int? iBeaconMinor;
+  final String? eddyStoneId1;
+  final String? eddyStoneId2;
+  final String? zoneName;
+  final String? zoneId;
+  final String? source;
+  final int? dwellTime;
+  final Map<String, String>? extra;
 
   BeaconRegion(
       this.beaconId,
@@ -40,14 +40,14 @@ class BeaconRegion {
         json['beaconTag'],
         json['beaconProximity'],
         json['iBeaconUUID'],
-        json['iBeaconMajor'] as int,
-        json['iBeaconMinor'] as int,
+        json['iBeaconMajor'] as int?,
+        json['iBeaconMinor'] as int?,
         json['eddyStoneId1'],
         json['eddyStoneId2'],
         json['zoneName'],
         json['zoneId'],
         json['source'],
-        json['dwellTime'] as int,
+        json['dwellTime'] as int?,
         json['extra']);
   }
 

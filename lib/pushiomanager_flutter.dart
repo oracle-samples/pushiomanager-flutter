@@ -1,10 +1,13 @@
 // Copyright © 2023, Oracle and/or its affiliates. All rights reserved.
 // Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
 
+// ignore_for_file: await_only_futures
+
 library pushiomanager_flutter;
 
 import 'dart:async';
 import 'dart:io';
+import 'dart:convert';
 
 import 'package:flutter/services.dart';
 import 'package:pushiomanager_flutter/beacon_region.dart';
@@ -16,11 +19,11 @@ import 'package:pushiomanager_flutter/preference.dart';
 import 'package:pushiomanager_flutter/utils.dart';
 import 'package:pushiomanager_flutter/custom_close_button.dart';
 
-typedef void NotificationDeepLinkHandler(String url);
+typedef void NotificationDeepLinkHandler(String? url);
 
 typedef void AppOpenLinkHandler(dynamic response);
-typedef void InAppMessageUrlResolveLinkHandler(Map<String, String> response);
-typedef void MessageCenterUpdateHandler(String messageCenter);
+typedef void InAppMessageUrlResolveLinkHandler(Map<String, String>? response);
+typedef void MessageCenterUpdateHandler(String? messageCenter);
 
 enum PreferenceType { STRING, NUMBER, BOOLEAN }
 
@@ -38,28 +41,28 @@ enum LogLevel { NONE, ERROR, WARN, INFO, DEBUG, VERBOSE }
 
 class PushIOManager {
   static MethodChannel _channel = new MethodChannel('pushiomanager_flutter');
-  static NotificationDeepLinkHandler _notificationDeepLinkHandler;
-  static AppOpenLinkHandler _appOpenLinkHandler;
-  static InAppMessageUrlResolveLinkHandler _inAppMessageUrlResolveLinkHandler;
+  static NotificationDeepLinkHandler? _notificationDeepLinkHandler;
+  static AppOpenLinkHandler? _appOpenLinkHandler;
+  static InAppMessageUrlResolveLinkHandler? _inAppMessageUrlResolveLinkHandler;
   static PushIOManager shared = new PushIOManager();
-  static MessageCenterUpdateHandler _messageCenterUpdateHandler;
+  static MessageCenterUpdateHandler? _messageCenterUpdateHandler;
 
   PushIOManager() {
     _channel.setMethodCallHandler(_handleNativeCallbacks);
   }
 
-  static Future<String> getAPIKey() async {
-    final String apiKey = await _channel.invokeMethod('getAPIKey');
+  static Future<String?> getAPIKey() async {
+    final String? apiKey = await _channel.invokeMethod('getAPIKey');
     return apiKey;
   }
 
-  static Future<String> getAccountToken() async {
-    final String accountToken = await _channel.invokeMethod('getAccountToken');
+  static Future<String?> getAccountToken() async {
+    final String? accountToken = await _channel.invokeMethod('getAccountToken');
     return accountToken;
   }
 
-  static Future<String> getExternalDeviceTrackingID() async {
-    final String externalDeviceTrackingID =
+  static Future<String?> getExternalDeviceTrackingID() async {
+    final String? externalDeviceTrackingID =
         await _channel.invokeMethod('getExternalDeviceTrackingID');
     return externalDeviceTrackingID;
   }
@@ -68,8 +71,8 @@ class PushIOManager {
     return await _channel.invokeMethod('setExternalDeviceTrackingID', edti);
   }
 
-  static Future<String> getAdvertisingID() async {
-    final String advertisingID =
+  static Future<String?> getAdvertisingID() async {
+    final String? advertisingID =
         await _channel.invokeMethod('getAdvertisingID');
     return advertisingID;
   }
@@ -78,12 +81,12 @@ class PushIOManager {
     return await _channel.invokeMethod('setAdvertisingID', adid);
   }
 
-  static Future<String> getRegisteredUserId() async {
-    final String userId = await _channel.invokeMethod('getRegisteredUserId');
+  static Future<String?> getRegisteredUserId() async {
+    final String? userId = await _channel.invokeMethod('getRegisteredUserId');
     return userId;
   }
 
-  static Future<void> registerUserId(String userId) async {
+  static Future<void> registerUserId(String? userId) async {
     return await _channel.invokeMethod('registerUserId', userId);
   }
 
@@ -97,22 +100,35 @@ class PushIOManager {
         {'key': key, 'label': label, 'type': preferenceTypeToString(type)});
   }
 
-  static Future<List<Preference>> getPreferences() async {
-    List preferences = await _channel.invokeMethod('getPreferences');
+  static Future<List<Preference>?> getPreferences() async {
+    var preferences = await _channel.invokeMethod('getPreferences');
 
-    return preferences.map((dynamic payload) {
+    List? preferencesList;
+
+    if (preferences.runtimeType == String) {
+      List? pref = jsonDecode(preferences);
+      preferencesList = pref;
+    } else {
+      preferencesList = preferences;
+    }
+
+    if (preferencesList == null && preferencesList?.length == 0) {
+      return null;
+    }
+
+    return preferencesList?.map((dynamic payload) {
       return Preference.fromJson(payload);
     }).toList();
   }
 
-  static Future<Preference> getPreference(String key) async {
+  static Future<Preference?> getPreference(String key) async {
     var preferenceJson = await _channel.invokeMethod('getPreference', key);
-
     if (preferenceJson == null) {
       return null;
     }
 
-    return Preference.fromJson(preferenceJson);
+    Map<String, dynamic> json = jsonDecode(preferenceJson);
+    return Preference.fromJson(json);
   }
 
   static Future<void> setStringPreference(String key, String value) async {
@@ -139,14 +155,14 @@ class PushIOManager {
   }
 
   static Future<void> trackEvent(String eventName,
-      {Map<String, String> properties}) async {
+      {Map<String, String>? properties}) async {
     return await _channel.invokeMethod(
         'trackEvent', {"eventName": eventName, "properties": properties});
   }
 
-  static Future<List<MessageCenterMessage>> fetchMessagesForMessageCenter(
+  static Future<List<MessageCenterMessage>?> fetchMessagesForMessageCenter(
       String messageCenter) async {
-    List messages = await _channel.invokeMethod(
+    List? messages = await _channel.invokeMethod(
         'fetchMessagesForMessageCenter', messageCenter);
     if (messages == null) return null;
 
@@ -156,7 +172,7 @@ class PushIOManager {
   }
 
   static Future<void> trackEngagement(EngagementType type,
-      {Map<String, String> properties}) async {
+      {Map<String, String>? properties}) async {
     int engagementMetric = engagementTypeToInt(type);
 
     if (Platform.isIOS) {
@@ -201,10 +217,10 @@ class PushIOManager {
     }
   }
 
-  static Future<bool> isDelayRegistration() async {
+  static Future<bool?> isDelayRegistration() async {
     if (Platform.isIOS) {
       dynamic response = await _channel.invokeMethod('isDelayRegistration');
-      return response as bool;
+      return response as bool?;
     } else {
       throw PlatformException(code: "API not supported");
     }
@@ -218,6 +234,18 @@ class PushIOManager {
     return await _channel.invokeMethod('registerApp', useLocation);
   }
 
+  static Future<void> registerAppForPush(
+      bool enablePushNotifications, bool useLocation) async {
+    if (Platform.isAndroid) {
+      return await _channel.invokeMethod('registerAppForPush', {
+        'enablePushNotifications': enablePushNotifications,
+        'useLocation': useLocation
+      });
+    } else {
+      throw PlatformException(code: "API not supported");
+    }
+  }
+
   static Future<void> registerForAllRemoteNotificationTypes() async {
     if (Platform.isIOS) {
       return await _channel
@@ -228,11 +256,11 @@ class PushIOManager {
   }
 
   static Future<void> registerForAllRemoteNotificationTypesWithCategories(
-      List<InteractiveNotificationCategory> categories) async {
+      List<InteractiveNotificationCategory>? categories) async {
     if (Platform.isIOS) {
       return await _channel.invokeMethod(
           'registerForAllRemoteNotificationTypesWithCategories',
-          categories.map((e) => e.toJson()).toList());
+          categories?.map((e) => e.toJson()).toList());
     } else {
       throw PlatformException(code: "API not supported");
     }
@@ -253,11 +281,11 @@ class PushIOManager {
     return await _channel.invokeMethod('unregisterApp');
   }
 
-  static Future<String> getDeviceID() async {
+  static Future<String?> getDeviceID() async {
     return await _channel.invokeMethod('getDeviceID');
   }
 
-  static Future<String> getLibVersion() async {
+  static Future<String?> getLibVersion() async {
     return await _channel.invokeMethod('getLibVersion');
   }
 
@@ -277,6 +305,24 @@ class PushIOManager {
     }
   }
 
+  static Future<void> setNotificationSmallIcon(String resourceName) async {
+    if (Platform.isAndroid) {
+      return await _channel.invokeMethod(
+          'setNotificationSmallIcon', resourceName);
+    } else {
+      throw PlatformException(code: "API not supported");
+    }
+  }
+
+  static Future<void> setNotificationLargeIcon(String resourceName) async {
+    if (Platform.isAndroid) {
+      return await _channel.invokeMethod(
+          'setNotificationLargeIcon', resourceName);
+    } else {
+      throw PlatformException(code: "API not supported");
+    }
+  }
+
   static Future<bool> isMessageCenterEnabled() async {
     dynamic response = await _channel.invokeMethod('isMessageCenterEnabled');
     return response as bool;
@@ -289,7 +335,7 @@ class PushIOManager {
   static Future<Map<String, String>> fetchRichContentForMessage(
       String messageID) async {
     Map<dynamic, dynamic> response =
-        await _channel.invokeMethod('fetchRichContentForMessage', messageID);
+        await (_channel.invokeMethod('fetchRichContentForMessage', messageID));
     return response.cast<String, String>();
   }
 
@@ -301,9 +347,9 @@ class PushIOManager {
     return await _channel.invokeMethod('setCrashLoggingEnabled', isEnabled);
   }
 
-  static Future<bool> isCrashLoggingEnabled() async {
+  static Future<bool?> isCrashLoggingEnabled() async {
     dynamic response = await _channel.invokeMethod('isCrashLoggingEnabled');
-    return response as bool;
+    return response as bool?;
   }
 
   static Future<void> setDeviceToken(String deviceToken) async {
@@ -329,9 +375,9 @@ class PushIOManager {
         {'badgeCount': badgeCount, 'forceSetBadge': forceSetBadge});
   }
 
-  static Future<int> getBadgeCount() async {
+  static Future<int?> getBadgeCount() async {
     dynamic response = await _channel.invokeMethod('getBadgeCount');
-    return response as int;
+    return response as int?;
   }
 
   static Future<void> resetBadgeCount({bool forceSetBadge: false}) async {
@@ -407,10 +453,11 @@ class PushIOManager {
     }
   }
 
-  static Future<bool> isResponsysPush(Map<String, dynamic> notification) async {
+  static Future<bool?> isResponsysPush(
+      Map<String, dynamic> notification) async {
     dynamic response =
         await _channel.invokeMethod('isResponsysPush', notification);
-    return response as bool;
+    return response as bool?;
   }
 
   static Future<void> handleMessage(Map<String, dynamic> notification) async {
@@ -444,39 +491,39 @@ class PushIOManager {
   static Future<Map<String, String>> onBeaconRegionExited(
       BeaconRegion region) async {
     Map<dynamic, dynamic> response =
-        await _channel.invokeMethod('onBeaconRegionExited', region.toJson());
+        await (_channel.invokeMethod('onBeaconRegionExited', region.toJson()));
     return response.cast<String, String>();
   }
 
-  static Future<bool> getExecuteRsysWebUrl() async {
+  static Future<bool?> getExecuteRsysWebUrl() async {
     dynamic response = await _channel.invokeMethod('getExecuteRsysWebUrl');
-    return response as bool;
+    return response as bool?;
   }
 
-  static Future<String> getConversionUrl() async {
+  static Future<String?> getConversionUrl() async {
     if (Platform.isAndroid) {
       dynamic response = await _channel.invokeMethod('getConversionUrl');
-      return response as String;
+      return response as String?;
     } else {
       throw PlatformException(code: "API not supported");
     }
   }
 
-  static Future<String> getRIAppId() async {
+  static Future<String?> getRIAppId() async {
     if (Platform.isAndroid) {
       dynamic response = await _channel.invokeMethod('getRIAppId');
-      return response as String;
+      return response as String?;
     } else {
       throw PlatformException(code: "API not supported");
     }
   }
 
-  static Future<String> getEngagementTimeStamp() async {
+  static Future<String?> getEngagementTimeStamp() async {
     dynamic response = await _channel.invokeMethod('getEngagementTimeStamp');
-    return response as String;
+    return response as String?;
   }
 
-  static Future<int> getEngagementMaxAge() async {
+  static Future<int?> getEngagementMaxAge() async {
     dynamic response = await _channel.invokeMethod('getEngagementMaxAge');
     return response.toInt();
   }
@@ -493,9 +540,9 @@ class PushIOManager {
     return await _channel.invokeMethod('showRichPushMessage');
   }
 
-  static Future<bool> isRichPushDelaySet() async {
+  static Future<bool?> isRichPushDelaySet() async {
     dynamic response = await _channel.invokeMethod('isRichPushDelaySet');
-    return response as bool;
+    return response as bool?;
   }
 
   static Future<void> trackConversionEvent(ConversionEvent event) async {
@@ -536,24 +583,24 @@ class PushIOManager {
   Future<void> _handleNativeCallbacks(MethodCall call) async {
     if (call.method == 'setIAMUrlResolveLinkHandler') {
       if (_inAppMessageUrlResolveLinkHandler != null) {
-        _inAppMessageUrlResolveLinkHandler(
+        _inAppMessageUrlResolveLinkHandler!(
             call.arguments.cast<String, String>());
       }
     } else if (call.method == 'setNotificationDeepLinkHandler') {
       if (_notificationDeepLinkHandler != null) {
-        _notificationDeepLinkHandler(call.arguments as String);
+        _notificationDeepLinkHandler!(call.arguments as String?);
       }
     } else if (call.method == 'setAppOpenLinkHandler') {
       if (_appOpenLinkHandler != null) {
         if (Platform.isAndroid) {
-          _appOpenLinkHandler(call.arguments.cast<String, String>());
+          _appOpenLinkHandler!(call.arguments.cast<String, String>());
         } else {
-          _appOpenLinkHandler(call.arguments['link'] as String);
+          _appOpenLinkHandler!(call.arguments['link'] as String?);
         }
       }
     } else if (call.method == 'onMessageCenterUpdate') {
       if (_messageCenterUpdateHandler != null) {
-        _messageCenterUpdateHandler(call.arguments as String);
+        _messageCenterUpdateHandler!(call.arguments as String?);
       }
     }
   }
@@ -562,10 +609,10 @@ class PushIOManager {
     return await _channel.invokeMethod('setInAppMessageBannerHeight', height);
   }
 
-  static Future<double> getInAppMessageBannerHeight() async {
+  static Future<double?> getInAppMessageBannerHeight() async {
     dynamic response =
         await _channel.invokeMethod('getInAppMessageBannerHeight');
-    return response as double;
+    return response as double?;
   }
 
   static Future<void> setStatusBarHiddenForIAMBannerInterstitial(
@@ -574,10 +621,10 @@ class PushIOManager {
         'setStatusBarHiddenForIAMBannerInterstitial', statusbarHidden);
   }
 
-  static Future<bool> isStatusBarHiddenForIAMBannerInterstitial() async {
+  static Future<bool?> isStatusBarHiddenForIAMBannerInterstitial() async {
     dynamic response = await _channel
         .invokeMethod('isStatusBarHiddenForIAMBannerInterstitial');
-    return response as bool;
+    return response as bool?;
   }
 
   static void onMessageCenterUpdate(MessageCenterUpdateHandler handler) {

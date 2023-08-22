@@ -18,13 +18,17 @@
 - (PIOGeoRegion *)geoRegion {
     NSString *geofenceId = self[@"geofenceId"];
     NSString *geofenceName = self[@"geofenceName"];
-    double speed = [self[@"speed"] doubleValue];
-    double bearing = [self[@"bearing"] doubleValue];
+    double speed = [self[@"deviceSpeed"] doubleValue];
+    double bearing = [self[@"deviceBearing"] doubleValue];
     NSString *zoneId = self[@"zoneId"];
     NSString *zoneName = self[@"zoneName"];
     NSString *source = self[@"source"];
     NSInteger dwellTime = [self[@"dwellTime"] integerValue];
-    NSDictionary *extra = self[@"extra"];
+    NSDictionary *extra = self[@"extra"] ;
+    
+    if(extra == nil || [extra isEqual:[NSNull  null]]) {
+        extra = nil;
+    }
 
     PIOGeoRegion *geoRegion = [[PIOGeoRegion alloc] initWithGeofenceId:geofenceId geofenceName:geofenceName speed:speed bearing:bearing source:source zoneId:zoneId zoneName:zoneName dwellTime:dwellTime extra:extra];
     
@@ -38,7 +42,7 @@
     NSString *beaconId = self[@"beaconId"];
     NSString *beaconName = self[@"beaconName"];
     NSString *beaconTag = self[@"beaconTag"];
-    NSString *proximity = self[@"proximity"];
+    NSString *proximity = self[@"beaconProximity"];
     NSString *zoneId = self[@"zoneId"];
     NSString *zoneName = self[@"zoneName"];
     NSString *source = self[@"source"];
@@ -46,6 +50,11 @@
     NSDictionary *extra = self[@"extra"];
     NSString *eddyStoneId1 = self[@"eddyStoneId1"];
     NSString *eddyStoneId2 = self[@"eddyStoneId2"];
+    
+    if(extra == nil || [extra isEqual:[NSNull  null]]) {
+        extra = nil;
+    }
+    
     PIOBeaconRegion *beaconRegion = [[PIOBeaconRegion alloc] initWithiBeaconUUID:iBeaconUUID iBeaconMajor:iBeaconMajor iBeaconMinor:iBeaconMinor beaconId:beaconId beaconName:beaconName beaconTag:beaconTag proximity:proximity source:source zoneId:zoneId zoneName:zoneName dwellTime:dwellTime extra:extra];
     beaconRegion.eddyStoneId1 = eddyStoneId1;
     beaconRegion.eddyStoneId2 = eddyStoneId2;
@@ -57,16 +66,21 @@
     NSArray *oracleButtons = self[@"orcl_btns"];
     NSMutableArray *actions = [NSMutableArray new];
     for (NSDictionary *action in oracleButtons) {
-        PIONotificationAction *newAction = [[PIONotificationAction alloc] initWithIdentifier:action[@"id"] title:action[@"label"] isDestructive:[action[@"action"] isEqualToString:@"DE"] isForeground:[action[@"action"] isEqualToString:@"FG"] isAuthenticationRequired:[action[@"action"] isEqualToString:@"AR"]];
-        [actions addObject:newAction];
+        
+        NSString *buttonAction = action[@"action"];
+        if(buttonAction != nil && ![buttonAction isEqual:[NSNull null]]) {
+            
+            PIONotificationAction *newAction = [[PIONotificationAction alloc] initWithIdentifier:action[@"id"] title:action[@"label"] isDestructive:[buttonAction isEqualToString:@"DE"] isForeground:[buttonAction isEqualToString:@"FG"] isAuthenticationRequired:[buttonAction isEqualToString:@"AR"]];
+            [actions addObject:newAction];
+        }
     }
     return [[PIONotificationCategory alloc] initWithIdentifier:self[@"orcl_category"] actions:actions];
 }
 
 - (UIButton *)customCloseButton {
     NSString *title = (self[@"title"] == (id)[NSNull null]) ? nil : self[@"title"];
-    NSString *backgroundColor = (self[@"backgroundColor"] == (id)[NSNull null]) ? nil : self[@"backgroundColor"];
-    NSString *titleColor = (self[@"titleColor"] == (id)[NSNull null]) ? nil : self[@"titleColor"];
+    NSString *backgroundColor = (NSString *)((self[@"backgroundColor"] == (id)[NSNull null]) ? nil : self[@"backgroundColor"]);
+    NSString *titleColor =  (NSString *)((self[@"titleColor"] == (id)[NSNull null]) ? nil : self[@"titleColor"]);
     NSString *imageName = (self[@"imageName"] == (id)[NSNull null]) ? nil : self[@"imageName"];
     if((title == nil || title.length == 0) && (imageName == nil || imageName.length == 0)){
         return nil;
@@ -81,7 +95,11 @@
     }
     if(title != nil){
         [closeButton setTitle:title forState:UIControlStateNormal];
-        [closeButton setBackgroundColor:[self colorFromHexString:backgroundColor]];
+        UIColor *bgColor = [self colorFromHexString:backgroundColor];
+        if(bgColor) {
+            [closeButton setBackgroundColor:bgColor];
+        }
+        
         [closeButton setTitleColor:[self colorFromHexString:titleColor] forState:UIControlStateNormal];
         [closeButton.titleLabel setAdjustsFontSizeToFitWidth:YES];
     }
@@ -89,6 +107,8 @@
 }
 
 + (NSDictionary *)dictionaryFromPreference:(PIOPreference *)preference {
+
+    if(preference != nil && preference.key != nil) {
     NSMutableDictionary *dictionary = [NSMutableDictionary dictionary];
     dictionary[@"key"] = preference.key;
     dictionary[@"value"] = preference.value;
@@ -105,6 +125,9 @@
               break;
       }
     return dictionary;
+    } else {
+        return nil;
+    } 
 }
 
 - (PIOConversionEvent *)conversionEvent {

@@ -2,7 +2,7 @@
 // Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
 
 group 'com.pushio.manager.flutter'
-version '6.54.1'
+version '6.56.1'
 
 buildscript {
     repositories {
@@ -33,6 +33,11 @@ dependencies {
 }
 
 android {
+
+    if (project.android.hasProperty("namespace")) {
+        namespace 'com.pushio.manager.flutter'
+    }
+
     compileSdkVersion 31
 
     defaultConfig {

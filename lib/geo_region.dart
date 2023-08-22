@@ -2,15 +2,15 @@
 // Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
 
 class GeoRegion {
-  final String geofenceId;
-  final String geofenceName;
-  final String zoneName;
-  final String zoneId;
-  final String source;
-  final double deviceBearing;
-  final double deviceSpeed;
-  final int dwellTime;
-  final Map<String, String> extra;
+  final String? geofenceId;
+  final String? geofenceName;
+  final String? zoneName;
+  final String? zoneId;
+  final String? source;
+  final double? deviceBearing;
+  final double? deviceSpeed;
+  final int? dwellTime;
+  final Map<String, String>? extra;
 
   GeoRegion(
       this.geofenceId,
@@ -30,9 +30,9 @@ class GeoRegion {
         json['zoneName'],
         json['zoneId'],
         json['source'],
-        json['deviceBearing'] as double,
-        json['deviceSpeed'] as double,
-        json['dwellTime'] as int,
+        json['deviceBearing'] as double?,
+        json['deviceSpeed'] as double?,
+        json['dwellTime'] as int?,
         json['extra']);
   }
 

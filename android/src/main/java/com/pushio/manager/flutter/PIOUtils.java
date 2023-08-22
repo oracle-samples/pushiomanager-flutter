@@ -42,6 +42,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
+@SuppressWarnings("unchecked")
 public class PIOUtils {
 
     static List<HashMap<String, Object>> preferencesAsList(List<PushIOPreference> preferences) {
@@ -82,7 +83,6 @@ public class PIOUtils {
             messageMap.put("iconURL", message.getIconUrl());
             messageMap.put("messageCenterName", message.getMessageCenterName());
             messageMap.put("deeplinkURL", message.getDeeplinkUrl());
-            messageMap.put("richMessageHTML", message.getRichMessageHtml());
             messageMap.put("richMessageURL", message.getRichMessageUrl());
             messageMap.put("sentTimestamp", getDateAsString(message.getSentTimestamp()));
             messageMap.put("expiryTimestamp", getDateAsString(message.getExpiryTimestamp()));
@@ -124,6 +124,7 @@ public class PIOUtils {
         region.setDwellTime((Integer) regionMap.get("dwellTime"));
 
         if (regionMap.containsKey("extra")) {
+            
             Map<String, String> extraData = (Map<String, String>) regionMap.get("extra");
             if (extraData != null) {
                 region.setExtra(extraData);

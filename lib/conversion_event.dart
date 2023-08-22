@@ -6,14 +6,14 @@ import 'package:pushiomanager_flutter/utils.dart';
 import 'dart:io';
 
 class ConversionEvent {
-  String orderId;
-  double orderTotal;
-  int orderQuantity;
-  EngagementType conversionType;
-  Map<String, String> customProperties;
+  String? orderId;
+  double? orderTotal;
+  int? orderQuantity;
+  late EngagementType conversionType;
+  Map<String, String>? customProperties;
 
-  ConversionEvent(String orderId, double orderTotal, int orderQuantity,
-      EngagementType conversionType, Map<String, String> customProperties) {
+  ConversionEvent(String? orderId, double? orderTotal, int? orderQuantity,
+      EngagementType conversionType, Map<String, String>? customProperties) {
     this.orderId = orderId;
     this.orderTotal = orderTotal;
     this.orderQuantity = orderQuantity;
@@ -32,8 +32,8 @@ class ConversionEvent {
   static ConversionEvent fromJson(dynamic json) {
     return ConversionEvent(
         json['orderId'],
-        json['orderTotal'] as double,
-        json['orderQuantity'] as int,
+        json['orderTotal'] as double?,
+        json['orderQuantity'] as int?,
         engagementTypeFromInt(json['conversionType'] as int),
         json['customProperties']);
   }

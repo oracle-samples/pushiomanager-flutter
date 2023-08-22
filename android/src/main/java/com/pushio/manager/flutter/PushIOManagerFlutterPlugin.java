@@ -70,8 +70,8 @@ import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
 import io.flutter.embedding.engine.plugins.FlutterPlugin.FlutterPluginBinding;
 import io.flutter.embedding.engine.plugins.lifecycle.FlutterLifecycleAdapter;
 
-
-public class PushIOManagerFlutterPlugin implements FlutterPlugin, MethodCallHandler, NewIntentListener, ActivityAware, LifecycleObserver {
+public class PushIOManagerFlutterPlugin
+        implements FlutterPlugin, MethodCallHandler, NewIntentListener, ActivityAware, LifecycleObserver {
     private MethodChannel channel;
     private PushIOManager mPushIOManager;
     private Context mContext;
@@ -165,7 +165,7 @@ public class PushIOManagerFlutterPlugin implements FlutterPlugin, MethodCallHand
         return handleIntent(intent);
     }
 
-    private boolean handleIntent(Intent intent){
+    private boolean handleIntent(Intent intent) {
         final String expectedDeepLinkAction = mContext.getPackageName() + ".intent.action.PROCESS_RSYS_DEEPLINK";
         final String expectedAppLinkHost = PIOUtils.getAppStringResource(mContext, "app_links_url_host");
 
@@ -178,17 +178,17 @@ public class PushIOManagerFlutterPlugin implements FlutterPlugin, MethodCallHand
 
         PIOLogger.v("FL hI Intent Action: " + linkIntentAction);
         if (expectedDeepLinkAction.equalsIgnoreCase(linkIntentAction)) {
-            PIOLogger.v("FL hI "+mPreferences.getBoolean("handlePushDeepLink", false));
+            PIOLogger.v("FL hI " + mPreferences.getBoolean("handlePushDeepLink", false));
             launchIntent = intent;
             return true;
-        }else if(linkIntentDataUri != null &&
+        } else if (linkIntentDataUri != null &&
                 !TextUtils.isEmpty(expectedAppLinkHost) &&
-                expectedAppLinkHost.equalsIgnoreCase(linkIntentDataUri.getHost())){
+                expectedAppLinkHost.equalsIgnoreCase(linkIntentDataUri.getHost())) {
             PIOLogger.v("FL hI tracking email conversion");
             launchIntent = null;
             trackEmailConversion(intent);
             return true;
-        }else{
+        } else {
             return false;
         }
     }
@@ -200,14 +200,14 @@ public class PushIOManagerFlutterPlugin implements FlutterPlugin, MethodCallHand
             @Override
             public void run() {
 
-                if(launchIntent == null){
+                if (launchIntent == null) {
                     PIOLogger.v("FL hPDL Launch Intent is null");
                     return;
                 }
-                
+
                 final String uri = launchIntent.getDataString();
 
-                if(!TextUtils.isEmpty(uri)){
+                if (!TextUtils.isEmpty(uri)) {
                     channel.invokeMethod("setNotificationDeepLinkHandler", uri);
                     launchIntent = null;
                 }
@@ -320,7 +320,7 @@ public class PushIOManagerFlutterPlugin implements FlutterPlugin, MethodCallHand
                 mPushIOManager.setPreference(key, (Long) value);
             } else if (value instanceof Double) {
                 mPushIOManager.setPreference(key, (Double) value);
-            }else{
+            } else {
                 result.error("Not a Number", null, null);
                 return;
             }
@@ -476,7 +476,49 @@ public class PushIOManagerFlutterPlugin implements FlutterPlugin, MethodCallHand
         mPushIOManager.registerApp(useLocation);
     }
 
-    private void setMessageCenterEnabled(MethodCall call, Result result){
+    private void registerAppForPush(MethodCall call, final Result result) {
+
+        boolean enablePushNotifications = true;
+        if (call.hasArgument("enablePushNotifications")) {
+            enablePushNotifications = call.argument("enablePushNotifications");
+        }
+
+        boolean useLocation = false;
+        if (call.hasArgument("useLocation")) {
+            useLocation = call.argument("useLocation");
+        }
+
+        mPushIOManager.registerPushIOListener(new PushIOListener() {
+            @Override
+            public void onPushIOSuccess() {
+                mPushIOManager.registerPushIOListener(null);
+
+                mUIThreadHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        result.success(null);
+                    }
+                });
+
+            }
+
+            @Override
+            public void onPushIOError(final String errorReason) {
+                mPushIOManager.registerPushIOListener(null);
+
+                mUIThreadHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        result.error(errorReason, null, null);
+                    }
+                });
+            }
+        });
+
+        mPushIOManager.registerApp(enablePushNotifications, useLocation);
+    }
+
+    private void setMessageCenterEnabled(MethodCall call, Result result) {
         boolean isEnabled = call.arguments();
 
         PIOLogger.v("setMessageCenterEnabled called");
@@ -502,16 +544,63 @@ public class PushIOManagerFlutterPlugin implements FlutterPlugin, MethodCallHand
         result.success(mPushIOManager.getDeviceId());
     }
 
-    private void setDefaultSmallIcon(MethodCall call, Result result){
+    private void setDefaultSmallIcon(MethodCall call, Result result) {
         int resId = call.arguments();
 
         mPushIOManager.setDefaultSmallIcon(resId);
     }
 
-    private void setDefaultLargeIcon(MethodCall call, Result result){
+    private void setDefaultLargeIcon(MethodCall call, Result result) {
         int resId = call.arguments();
 
         mPushIOManager.setDefaultLargeIcon(resId);
+    }
+
+    private void setNotificationSmallIcon(MethodCall call, Result result) {
+
+        String resourceName = call.arguments();
+
+        if (!TextUtils.isEmpty(resourceName)) {
+            int resourceId = mContext.getResources().getIdentifier(
+                    resourceName, "drawable", mContext.getPackageName());
+
+            if (resourceId <= 0) {
+                resourceId = mContext.getResources().getIdentifier(
+                        resourceName, "mipmap", mContext.getPackageName());
+            }
+
+            if (resourceId > 0) {
+                mPushIOManager.setDefaultSmallIcon(resourceId);
+                result.success(null);
+            } else {
+                result.error("Resource not found", null, null);
+            }
+        } else {
+            result.error("Invalid resource name", null, null);
+        }
+    }
+
+    private void setNotificationLargeIcon(MethodCall call, Result result) {
+        String resourceName = call.arguments();
+
+        if (!TextUtils.isEmpty(resourceName)) {
+            int resourceId = mContext.getResources().getIdentifier(
+                    resourceName, "drawable", mContext.getPackageName());
+
+            if (resourceId <= 0) {
+                resourceId = mContext.getResources().getIdentifier(
+                        resourceName, "mipmap", mContext.getPackageName());
+            }
+
+            if (resourceId > 0) {
+                mPushIOManager.setDefaultLargeIcon(resourceId);
+                result.success(null);
+            } else {
+                result.error("Resource not found", null, null);
+            }
+        } else {
+            result.error("Invalid resource name", null, null);
+        }
     }
 
     private void isMessageCenterEnabled(MethodCall call, Result result) {
@@ -542,13 +631,13 @@ public class PushIOManagerFlutterPlugin implements FlutterPlugin, MethodCallHand
         }
     }
 
-    private void setInAppFetchEnabled(MethodCall call, Result result){
+    private void setInAppFetchEnabled(MethodCall call, Result result) {
         boolean isEnabled = call.arguments();
 
         mPushIOManager.setInAppFetchEnabled(isEnabled);
     }
 
-    private void setCrashLoggingEnabled(MethodCall call, Result result){
+    private void setCrashLoggingEnabled(MethodCall call, Result result) {
         boolean isEnabled = call.arguments();
 
         mPushIOManager.setCrashLoggingEnabled(isEnabled);
@@ -565,7 +654,7 @@ public class PushIOManagerFlutterPlugin implements FlutterPlugin, MethodCallHand
         result.success(null);
     }
 
-    private void setMessageCenterBadgingEnabled(MethodCall call, Result result){
+    private void setMessageCenterBadgingEnabled(MethodCall call, Result result) {
         boolean isEnabled = call.arguments();
 
         mPushIOManager.setMessageCenterBadgingEnabled(isEnabled);
@@ -673,7 +762,8 @@ public class PushIOManagerFlutterPlugin implements FlutterPlugin, MethodCallHand
     private void getInteractiveNotificationCategory(MethodCall call, Result result) {
         final String categoryID = call.arguments();
 
-        PIOInteractiveNotificationCategory notificationCategory = mPushIOManager.getInteractiveNotificationCategory(categoryID);
+        PIOInteractiveNotificationCategory notificationCategory = mPushIOManager
+                .getInteractiveNotificationCategory(categoryID);
 
         Map<String, Object> notificationCategoryMap = PIOUtils.notificationCategoryToMap(notificationCategory);
 
@@ -681,25 +771,26 @@ public class PushIOManagerFlutterPlugin implements FlutterPlugin, MethodCallHand
     }
 
     private void addInteractiveNotificationCategory(MethodCall call, Result result) {
-        final Map<String, Object>  notificationCategoryMap = call.arguments();
+        final Map<String, Object> notificationCategoryMap = call.arguments();
 
-        PIOInteractiveNotificationCategory notificationCategory = PIOUtils.notificationCategoryFromMap(notificationCategoryMap);
+        PIOInteractiveNotificationCategory notificationCategory = PIOUtils
+                .notificationCategoryFromMap(notificationCategoryMap);
 
         mPushIOManager.addInteractiveNotificationCategory(notificationCategory);
 
         result.success(null);
     }
 
-    private void isResponsysPush(MethodCall call, Result result){
-        if(call.hasArgument("rsys_src")){
+    private void isResponsysPush(MethodCall call, Result result) {
+        if (call.hasArgument("rsys_src")) {
             final String src = call.argument("rsys_src");
             result.success(!TextUtils.isEmpty(src) && src.equalsIgnoreCase("orcl"));
-        }else{
+        } else {
             result.error("Invalid Message Payload", null, null);
         }
     }
 
-    private void handleMessage(MethodCall call, Result result){
+    private void handleMessage(MethodCall call, Result result) {
         Map<String, String> message = call.arguments();
 
         RemoteMessage remoteMessage = PIOUtils.remoteMessageFromMap(message);
@@ -727,7 +818,6 @@ public class PushIOManagerFlutterPlugin implements FlutterPlugin, MethodCallHand
         result.success(mPushIOManager.getEngagementMaxAge());
     }
 
-
     private void resetEngagementContext(MethodCall call, Result result) {
         mPushIOManager.resetEngagementContext();
         result.success(null);
@@ -751,17 +841,18 @@ public class PushIOManagerFlutterPlugin implements FlutterPlugin, MethodCallHand
     private void trackConversionEvent(MethodCall call, final Result result) {
         Map<String, Object> conversionEventMap = call.arguments();
 
-        mPushIOManager.trackConversionEvent(PIOUtils.conversionEventFromMap(conversionEventMap), new PIOConversionListener() {
-            @Override
-            public void onSuccess() {
-                result.success(null);
-            }
+        mPushIOManager.trackConversionEvent(PIOUtils.conversionEventFromMap(conversionEventMap),
+                new PIOConversionListener() {
+                    @Override
+                    public void onSuccess() {
+                        result.success(null);
+                    }
 
-            @Override
-            public void onFailure(Exception e) {
-                result.error(e.getMessage(), null, null);
-            }
-        });
+                    @Override
+                    public void onFailure(Exception e) {
+                        result.error(e.getMessage(), null, null);
+                    }
+                });
     }
 
     private void onGeoRegionEntered(MethodCall call, final Result result) {
@@ -772,12 +863,12 @@ public class PushIOManagerFlutterPlugin implements FlutterPlugin, MethodCallHand
         mPushIOManager.onGeoRegionEntered(region, new PIORegionCompletionListener() {
             @Override
             public void onRegionReported(String regionId, PIORegionEventType regionType, PIORegionException e) {
-                if(e == null){
+                if (e == null) {
                     Map<String, String> response = new HashMap<>();
                     response.put("regionID", regionId);
                     response.put("regionType", regionType.toString());
                     result.success(response);
-                }else{
+                } else {
                     result.error(regionId, e.getErrorMessage(), e.getErrorDescription());
                 }
             }
@@ -792,12 +883,12 @@ public class PushIOManagerFlutterPlugin implements FlutterPlugin, MethodCallHand
         mPushIOManager.onGeoRegionExited(region, new PIORegionCompletionListener() {
             @Override
             public void onRegionReported(String regionId, PIORegionEventType regionType, PIORegionException e) {
-                if(e == null){
+                if (e == null) {
                     Map<String, String> response = new HashMap<>();
                     response.put("regionID", regionId);
                     response.put("regionType", regionType.toString());
                     result.success(response);
-                }else{
+                } else {
                     result.error(regionId, e.getErrorMessage(), e.getErrorDescription());
                 }
             }
@@ -812,12 +903,12 @@ public class PushIOManagerFlutterPlugin implements FlutterPlugin, MethodCallHand
         mPushIOManager.onBeaconRegionEntered(region, new PIORegionCompletionListener() {
             @Override
             public void onRegionReported(String regionId, PIORegionEventType regionType, PIORegionException e) {
-                if(e == null){
+                if (e == null) {
                     Map<String, String> response = new HashMap<>();
                     response.put("regionID", regionId);
                     response.put("regionType", regionType.toString());
                     result.success(response);
-                }else{
+                } else {
                     result.error(regionId, e.getErrorMessage(), e.getErrorDescription());
                 }
             }
@@ -832,19 +923,19 @@ public class PushIOManagerFlutterPlugin implements FlutterPlugin, MethodCallHand
         mPushIOManager.onBeaconRegionExited(region, new PIORegionCompletionListener() {
             @Override
             public void onRegionReported(String regionId, PIORegionEventType regionType, PIORegionException e) {
-                if(e == null){
+                if (e == null) {
                     Map<String, String> response = new HashMap<>();
                     response.put("regionID", regionId);
                     response.put("regionType", regionType.toString());
                     result.success(response);
-                }else{
+                } else {
                     result.error(regionId, e.getErrorMessage(), e.getErrorDescription());
                 }
             }
         });
     }
 
-    private void setExecuteRsysWebUrl(MethodCall call, Result result){
+    private void setExecuteRsysWebUrl(MethodCall call, Result result) {
         boolean isEnabled = call.arguments();
         mPushIOManager.setExecuteRsysWebUrl(isEnabled, new PIORsysIAMHyperlinkListener() {
             @Override
@@ -868,14 +959,14 @@ public class PushIOManagerFlutterPlugin implements FlutterPlugin, MethodCallHand
         });
     }
 
-    private void setInterceptDeepLink(MethodCall call, Result result){
+    private void setInterceptDeepLink(MethodCall call, Result result) {
         boolean isEnabled = call.arguments();
-        PIOLogger.v("is Intercept DeepLink enabled: "+isEnabled);
+        PIOLogger.v("is Intercept DeepLink enabled: " + isEnabled);
         mPreferences.edit().putBoolean("handlePushDeepLink", isEnabled).commit();
-        PIOLogger.v("is Intercept DeepLink enabled done: "+mPreferences.getBoolean("handlePushDeepLink", false));
+        PIOLogger.v("is Intercept DeepLink enabled done: " + mPreferences.getBoolean("handlePushDeepLink", false));
     }
 
-    private void setInterceptAppOpenLink(MethodCall call, Result result){
+    private void setInterceptAppOpenLink(MethodCall call, Result result) {
         boolean isEnabled = call.arguments();
         mPreferences.edit().putBoolean("handleAppOpenLink", isEnabled).commit();
     }
@@ -896,7 +987,7 @@ public class PushIOManagerFlutterPlugin implements FlutterPlugin, MethodCallHand
     private void setInAppMessageBannerHeight(MethodCall call, Result result) {
         PIOLogger.v("FL sIAMBH Banner Height: " + call.arguments());
         final double bannerHeight = call.arguments();
-        mPushIOManager.setInAppMessageBannerHeight((int)bannerHeight);
+        mPushIOManager.setInAppMessageBannerHeight((int) bannerHeight);
         result.success(null);
     }
 
@@ -925,9 +1016,9 @@ public class PushIOManagerFlutterPlugin implements FlutterPlugin, MethodCallHand
         });
     }
 
-    private void setInAppCustomCloseButton(MethodCall call, Result result){
-        
-        if(mActivity == null){
+    private void setInAppCustomCloseButton(MethodCall call, Result result) {
+
+        if (mActivity == null) {
             PIOLogger.v("FL sIACCB No Activity found to apply the custom button");
             result.error(null, null, null);
             return;
@@ -935,16 +1026,17 @@ public class PushIOManagerFlutterPlugin implements FlutterPlugin, MethodCallHand
 
         final String customButtonAsJsonStr = call.arguments();
 
-        if(TextUtils.isEmpty(customButtonAsJsonStr)){
+        if (TextUtils.isEmpty(customButtonAsJsonStr)) {
             PIOLogger.v("FL sIACCB Custom button properties not found");
             result.error(null, null, null);
             return;
         }
 
         try {
-            mPushIOManager.setInAppMessageCloseButton(mActivity, PIOUtils.getButtonFromJson(mActivity, customButtonAsJsonStr));
+            mPushIOManager.setInAppMessageCloseButton(mActivity,
+                    PIOUtils.getButtonFromJson(mActivity, customButtonAsJsonStr));
         } catch (Exception e) {
-            PIOLogger.v("FL sIACCB "+e.getMessage());
+            PIOLogger.v("FL sIACCB " + e.getMessage());
             result.error(null, null, null);
             return;
         }

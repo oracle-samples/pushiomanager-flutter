@@ -6,11 +6,11 @@
 
 Pod::Spec.new do |s|
   s.name             = 'pushiomanager_flutter'
-  s.version          = '6.54.0'
+  s.version          = '6.56.1'
   s.summary          = 'Flutter Plugin for Responsys Mobile SDK'
   s.description      = 'Flutter Plugin for Responsys Mobile SDK'
   s.homepage         = 'https://www.github.com/oracle/pushiomanager-flutter'
-  s.license          = { :file => '../LICENSE' }
+  s.license          = { :file => '../LICENSE.txt' }
   s.author           = { 'Oracle Corp.' => 'neerhaj.joshi@oracle.com' }
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'

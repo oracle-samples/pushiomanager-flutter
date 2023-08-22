@@ -1,20 +1,20 @@
 Pod::Spec.new do |s|
-   	s.version                 = "6.54.0"
+   	s.version                 = "6.56.1"
    	s.name                    = "PushIOManager"
    	s.summary                 = "Responsys iOS SDK"
    	s.documentation_url       = ""
    	s.homepage                = "https://github.com/pushio/PushIOManager_iOS"
    	s.author                  = "Oracle"
-        s.license                 = ""
+        s.license                 = { :file => '../LICENSE.txt' }
    	s.source                  = { :git => "https://github.com/pushio/PushIOManager_iOS", :tag => s.version.to_s }
 
    	s.module_name             = "PushIOManager"
 
-   	s.ios.deployment_target   = "11.0"
+   	s.ios.deployment_target   = "12.0"
    	s.requires_arc            =  true
 
-   	s.vendored_frameworks 	  = "PushIOManager.framework"
-    s.preserve_paths 	  = "PushIOManager.framework/**/*"
+   	s.vendored_frameworks 	  = "PushIOManager.xcframework"
+    s.preserve_paths 	  = "PushIOManager.xcframework/**/*"
    	
    	s.libraries               = 'sqlite3'
    	s.frameworks              = 'UserNotifications', 'CoreLocation', 'Foundation', 'UIKit'

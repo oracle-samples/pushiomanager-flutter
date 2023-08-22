@@ -31,7 +31,7 @@ EngagementType engagementTypeFromInt(int type) {
       .singleWhere((element) => engagementTypeToInt(element) == type);
 }
 
-String preferenceTypeToString(PreferenceType type) {
+String? preferenceTypeToString(PreferenceType type) {
   switch (type) {
     case PreferenceType.STRING:
       return "STRING";
@@ -44,7 +44,7 @@ String preferenceTypeToString(PreferenceType type) {
   }
 }
 
-PreferenceType preferenceTypeFromString(String type) {
+PreferenceType preferenceTypeFromString(String? type) {
   return PreferenceType.values
       .singleWhere((element) => preferenceTypeToString(element) == type);
 }
