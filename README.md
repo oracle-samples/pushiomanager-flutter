@@ -363,17 +363,12 @@ Refer this [intercepting-deeplink](https://docs.oracle.com/en/cloud/saas/marketi
 	  android:launchMode="singleTask">
 	  
 	  <intent-filter>
-        <action android:name="${applicationId}.intent.action.PROCESS_RSYS_DEEPLINK" />
-        <category android:name="android.intent.category.DEFAULT" />
-        <data android:scheme="YOUR_CUSTOM_URL_SCHEME" />
-      </intent-filter>
+            <action android:name="${applicationId}.intent.action.PROCESS_RSYS_DEEPLINK" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <data android:scheme="YOUR_CUSTOM_URL_SCHEME" />
+          </intent-filter>
 	 
 	</activity>
-	```
-
-- Add the following code to your `MainActivity`,
-
-	```java
 	```
 
 #### Dart Code
