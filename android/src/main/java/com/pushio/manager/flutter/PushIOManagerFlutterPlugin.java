@@ -765,9 +765,12 @@ public class PushIOManagerFlutterPlugin
         PIOInteractiveNotificationCategory notificationCategory = mPushIOManager
                 .getInteractiveNotificationCategory(categoryID);
 
-        Map<String, Object> notificationCategoryMap = PIOUtils.notificationCategoryToMap(notificationCategory);
-
-        result.success(notificationCategoryMap);
+        if (notificationCategory != null) {
+            Map<String, Object> notificationCategoryMap = PIOUtils.notificationCategoryToMap(notificationCategory);
+            result.success(notificationCategoryMap);
+        } else {
+            result.error("Invalid Category ID", null, null);
+        }
     }
 
     private void addInteractiveNotificationCategory(MethodCall call, Result result) {
