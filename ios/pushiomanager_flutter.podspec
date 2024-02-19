@@ -1,4 +1,4 @@
-# Copyright © 2023, Oracle and/or its affiliates. All rights reserved.
+# Copyright © 2024, Oracle and/or its affiliates. All rights reserved.
 # Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
 
 # To learn more about a Podspec see http://guides.cocoapods.org/syntax/podspec.html.
@@ -6,10 +6,10 @@
 
 Pod::Spec.new do |s|
   s.name             = 'pushiomanager_flutter'
-  s.version          = '6.56.1'
+  s.version          = '6.56.3'
   s.summary          = 'Flutter Plugin for Responsys Mobile SDK'
   s.description      = 'Flutter Plugin for Responsys Mobile SDK'
-  s.homepage         = 'https://www.github.com/oracle/pushiomanager-flutter'
+  s.homepage         = 'https://github.com/oracle-samples/pushiomanager-flutter'
   s.license          = { :file => '../LICENSE.txt' }
   s.author           = { 'Oracle Corp.' => 'neerhaj.joshi@oracle.com' }
   s.source           = { :path => '.' }
@@ -17,10 +17,10 @@ Pod::Spec.new do |s|
   s.public_header_files = 'Classes/**/*.h'
   s.dependency 'Flutter'
   s.platform = :ios, '12.0'
-  s.preserve_paths = 'PushIOManager.xcframework'
+  s.preserve_paths = 'PushIOManager/PushIOManager.xcframework'
   s.xcconfig = { 'OTHER_LDFLAGS' => '-framework PushIOManager -ObjC' }
-  s.vendored_frameworks = 'PushIOManager.xcframework'
-  s.preserve_paths 	  = "PushIOManager.xcframework/**/*"
+  s.vendored_frameworks = 'PushIOManager/PushIOManager.xcframework'
+  s.preserve_paths 	  = "PushIOManager/PushIOManager.xcframework/**/*"
   s.libraries               = 'sqlite3'
   s.frameworks              = 'UserNotifications', 'CoreLocation', 'Foundation', 'UIKit'
   s.ios.frameworks          = 'WebKit'

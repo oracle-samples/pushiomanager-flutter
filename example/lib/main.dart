@@ -59,7 +59,6 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     PushIOManager.setLogLevel(LogLevel.VERBOSE);
     super.initState();
-    PushIOManager.setMessageCenterEnabled(false);
     PushIOManager.setMessageCenterEnabled(true);
   }
 

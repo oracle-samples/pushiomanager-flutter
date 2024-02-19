@@ -1,5 +1,5 @@
 /**
-* Copyright © 2023, Oracle and/or its affiliates. All rights reserved.
+* Copyright © 2024, Oracle and/or its affiliates. All rights reserved.
 *
 * Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
 */
@@ -524,6 +524,8 @@ public class PushIOManagerFlutterPlugin
         PIOLogger.v("setMessageCenterEnabled called");
 
         mPushIOManager.setMessageCenterEnabled(isEnabled);
+
+        result.success(null);
     }
 
     private void unregisterApp(MethodCall call, final Result result) {
@@ -548,12 +550,16 @@ public class PushIOManagerFlutterPlugin
         int resId = call.arguments();
 
         mPushIOManager.setDefaultSmallIcon(resId);
+
+        result.success(null);
     }
 
     private void setDefaultLargeIcon(MethodCall call, Result result) {
         int resId = call.arguments();
 
         mPushIOManager.setDefaultLargeIcon(resId);
+
+        result.success(null);
     }
 
     private void setNotificationSmallIcon(MethodCall call, Result result) {
@@ -635,12 +641,16 @@ public class PushIOManagerFlutterPlugin
         boolean isEnabled = call.arguments();
 
         mPushIOManager.setInAppFetchEnabled(isEnabled);
+
+        result.success(null);
     }
 
     private void setCrashLoggingEnabled(MethodCall call, Result result) {
         boolean isEnabled = call.arguments();
 
         mPushIOManager.setCrashLoggingEnabled(isEnabled);
+
+        result.success(null);
     }
 
     private void isCrashLoggingEnabled(MethodCall call, Result result) {
@@ -658,6 +668,8 @@ public class PushIOManagerFlutterPlugin
         boolean isEnabled = call.arguments();
 
         mPushIOManager.setMessageCenterBadgingEnabled(isEnabled);
+
+        result.success(null);
     }
 
     private void setBadgeCount(MethodCall call, final Result result) {
@@ -799,6 +811,8 @@ public class PushIOManagerFlutterPlugin
         RemoteMessage remoteMessage = PIOUtils.remoteMessageFromMap(message);
 
         mPushIOManager.handleMessage(remoteMessage);
+
+        result.success(null);
     }
 
     private void getExecuteRsysWebUrl(MethodCall call, Result result) {
@@ -960,6 +974,8 @@ public class PushIOManagerFlutterPlugin
                 channel.invokeMethod("setIAMUrlResolveLinkHandler", response);
             }
         });
+
+        result.success(null);
     }
 
     private void setInterceptDeepLink(MethodCall call, Result result) {
@@ -967,11 +983,13 @@ public class PushIOManagerFlutterPlugin
         PIOLogger.v("is Intercept DeepLink enabled: " + isEnabled);
         mPreferences.edit().putBoolean("handlePushDeepLink", isEnabled).commit();
         PIOLogger.v("is Intercept DeepLink enabled done: " + mPreferences.getBoolean("handlePushDeepLink", false));
+        result.success(null);
     }
 
     private void setInterceptAppOpenLink(MethodCall call, Result result) {
         boolean isEnabled = call.arguments();
         mPreferences.edit().putBoolean("handleAppOpenLink", isEnabled).commit();
+        result.success(null);
     }
 
     private void trackEmailConversion(Intent intent) {

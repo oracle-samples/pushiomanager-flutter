@@ -50,7 +50,7 @@ Before installing the plugin, you must setup your app to receive push notificati
 
 	```gradle
 	configurations.maybeCreate("default")
-	artifacts.add("default", file('PushIOManager-6.56.1.aar'))
+	artifacts.add("default", file('PushIOManager-6.56.3.aar'))
 	```		
 
 - Add the following to your project-wide `settings.gradle` file:
@@ -390,7 +390,7 @@ PushIOManager.setNotificationDeepLinkHandler((String url) {
 
 ```
 
-
+2024
 
 ## Support
 

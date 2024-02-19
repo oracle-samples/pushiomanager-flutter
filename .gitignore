@@ -1,6 +1,6 @@
 .DS_Store
 .dart_tool/
-
+*.aar
 .packages
 .pub/
 
@@ -11,3 +11,5 @@ pubspec.lock
 .flutter-plugins-dependencies
 .flutter-plugins
 .vscode/
+ios/PushIOManager
+example/android/app/src/main/assets/
