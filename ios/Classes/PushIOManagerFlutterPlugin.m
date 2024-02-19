@@ -974,8 +974,13 @@ return sharedInstance;
         return NO;
     }
 
-    [self.channel invokeMethod:@"setNotificationDeepLinkHandler" arguments:[url absoluteString]];
-    return YES; //It's intercepted everytime.
+    BOOL isDeepLinkHandlerSet =  [[NSUserDefaults standardUserDefaults] boolForKey:@"PIODeeplinkHandler"];
+    if(isDeepLinkHandlerSet) {
+        [self.channel invokeMethod:@"setNotificationDeepLinkHandler" arguments:[url absoluteString]];
+        return YES;
+    }else{
+        return NO;
+    }
 }
 
 -(void)setDelayRichPushDisplay:(FlutterMethodCall *)call withResult:(FlutterResult)result {
@@ -1071,8 +1076,14 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
 
 
 - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
-    [[PushIOManager sharedInstance] openURL:url options:options];
-    return YES;
+
+    BOOL isDeepLinkHandlerSet =  [[NSUserDefaults standardUserDefaults] boolForKey:@"PIODeeplinkHandler"];
+    if(isDeepLinkHandlerSet) {
+        [[PushIOManager sharedInstance] openURL:url options:options];
+        return YES;
+    }else{
+        return NO;
+    }
 }
 
 - (BOOL)application:(UIApplication*)application
