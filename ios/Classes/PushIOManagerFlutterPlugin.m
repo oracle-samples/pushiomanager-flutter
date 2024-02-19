@@ -296,17 +296,6 @@ return sharedInstance;
     }];
 }
 
-//- (void)setOracleCXAccountId:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-//
-//    NSString* accountId = call.arguments[@"accountId"];
-//    if (accountId == (id)[NSNull null]) {
-//        accountId = nil;
-//    }
-//    [[PushIOManager sharedInstance] setOracleCXAccountId:accountId];
-//    [self sendPluginResult:result withResponse:nil andError:nil];
-//}
-//
-
 - (void)setLogLevel:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     id value = call.arguments;
     if (value == (id)[NSNull null]) {
@@ -402,8 +391,6 @@ return sharedInstance;
     [[PushIOManager sharedInstance] resetEngagementContext];
     [self sendPluginResult:result withResponse:nil andError:nil];
 }
-
-
 
 -(void)setMessageCenterEnabled:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     id value = call.arguments;

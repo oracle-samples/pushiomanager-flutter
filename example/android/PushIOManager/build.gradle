@@ -1,2 +1,2 @@
 configurations.maybeCreate("default")
-artifacts.add("default", file('PushIOManager-6.56.1.aar'))
+artifacts.add("default", file('PushIOManager-6.56.3.aar'))
