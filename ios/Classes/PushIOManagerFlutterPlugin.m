@@ -966,6 +966,7 @@ return sharedInstance;
 
     }
 
+    [self sendPluginResult:result withResponse:nil andError:nil];
 }
 //
 - (BOOL)handleOpenURL:(NSURL *)url {
@@ -983,6 +984,8 @@ return sharedInstance;
         value = nil;
     }
     [[PushIOManager sharedInstance] setDelayRichPushDisplay:[value boolValue]];
+
+    [self sendPluginResult:result withResponse:nil andError:nil];
 }
 
 -(void)showRichPushMessage:(FlutterMethodCall *)call withResult:(FlutterResult)result {
