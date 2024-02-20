@@ -17,10 +17,10 @@ Pod::Spec.new do |s|
   s.public_header_files = 'Classes/**/*.h'
   s.dependency 'Flutter'
   s.platform = :ios, '12.0'
-  s.preserve_paths = 'PushIOManager/PushIOManager.xcframework'
+  s.preserve_paths = 'PushIOManager.xcframework'
   s.xcconfig = { 'OTHER_LDFLAGS' => '-framework PushIOManager -ObjC' }
-  s.vendored_frameworks = 'PushIOManager/PushIOManager.xcframework'
-  s.preserve_paths 	  = "PushIOManager/PushIOManager.xcframework/**/*"
+  s.vendored_frameworks = 'PushIOManager.xcframework'
+  s.preserve_paths 	  = "PushIOManager.xcframework/**/*"
   s.libraries               = 'sqlite3'
   s.frameworks              = 'UserNotifications', 'CoreLocation', 'Foundation', 'UIKit'
   s.ios.frameworks          = 'WebKit'
