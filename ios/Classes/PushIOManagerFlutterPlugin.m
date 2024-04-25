@@ -155,10 +155,6 @@ return sharedInstance;
         [self addInteractiveNotificationCategory:call withResult:result];
     } else if ([@"isSDKConfigured" isEqualToString:call.method]) {
         [self isSDKConfigured:call withResult:result];
-    } else if ([@"setCrashLoggingEnabled" isEqualToString:call.method]) {
-        [self setCrashLoggingEnabled:call withResult:result];
-    } else if ([@"isCrashLoggingEnabled" isEqualToString:call.method]) {
-        [self isCrashLoggingEnabled:call withResult:result];
     } else if ([@"setLoggingEnabled" isEqualToString:call.method]) {
         [self setLoggingEnabled:call withResult:result];
     } else if ([@"isLoggingEnabled" isEqualToString:call.method]) {
@@ -711,20 +707,6 @@ return sharedInstance;
     result(@(isSDKConfigured));
 }
 
--(void)setCrashLoggingEnabled:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    id value = call.arguments;
-    if (value == (id)[NSNull null]) {
-        value = nil;
-    }
-    BOOL enableCrashLogging = [value boolValue];
-    [[PushIOManager sharedInstance] setCrashLoggingEnabled:enableCrashLogging];
-    [self sendPluginResult:result withResponse:nil andError:nil];
-}
-
--(void)isCrashLoggingEnabled:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    BOOL isCrashLoggingEnabled = [[PushIOManager sharedInstance] isCrashLoggingEnabled];
-    result(@(isCrashLoggingEnabled));
-}
 
 -(void)setLoggingEnabled:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     id value = call.arguments;

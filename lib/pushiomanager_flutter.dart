@@ -344,12 +344,18 @@ class PushIOManager {
   }
 
   static Future<void> setCrashLoggingEnabled(bool isEnabled) async {
-    return await _channel.invokeMethod('setCrashLoggingEnabled', isEnabled);
+    if (Platform.isAndroid) {
+      return await _channel.invokeMethod('setCrashLoggingEnabled', isEnabled);
+    }
   }
 
   static Future<bool?> isCrashLoggingEnabled() async {
-    dynamic response = await _channel.invokeMethod('isCrashLoggingEnabled');
-    return response as bool?;
+    if (Platform.isAndroid) {
+      dynamic response = await _channel.invokeMethod('isCrashLoggingEnabled');
+      return response as bool?;
+    } else {
+      return false;
+    }
   }
 
   static Future<void> setDeviceToken(String deviceToken) async {
