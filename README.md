@@ -41,7 +41,7 @@ This plugin makes it easy to integrate the Responsys Mobile SDK with your Flutte
 Before installing the plugin, you must setup your app to receive push notifications.
 
 ### For Android
-- [Get FCM Credentials](https://docs.oracle.com/en/cloud/saas/marketing/responsys-develop-mobile/android/gcm-credentials) 
+- [Get FCM Credentials](https://docs.oracle.com/en/cloud/saas/marketing/responsys-develop-mobile/android/fcm-credentials.htm) 
 - Log in to the [Responsys Mobile App Developer Console](https://docs.oracle.com/en/cloud/saas/marketing/responsys-develop-mobile/dev-console/login/) and enter your FCM credentials (Project ID and Server API Key) for your Android app.
 - Get the `pushio_config.json` file generated from your credentials and place it in your project's `android/app/src/main/assets` folder. You might have to create the directory if it is not already present.
 - Download the latest SDK binary from [here](https://www.oracle.com/downloads/applications/cx/responsys-mobile-sdk.html). 
