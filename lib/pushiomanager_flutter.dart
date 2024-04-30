@@ -346,6 +346,8 @@ class PushIOManager {
   static Future<void> setCrashLoggingEnabled(bool isEnabled) async {
     if (Platform.isAndroid) {
       return await _channel.invokeMethod('setCrashLoggingEnabled', isEnabled);
+    } else {
+      throw PlatformException(code: "API not supported");
     }
   }
 
@@ -354,7 +356,7 @@ class PushIOManager {
       dynamic response = await _channel.invokeMethod('isCrashLoggingEnabled');
       return response as bool?;
     } else {
-      return false;
+      throw PlatformException(code: "API not supported");
     }
   }
 
