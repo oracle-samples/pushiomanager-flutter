@@ -2,7 +2,7 @@
 // Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
 
 group 'com.pushio.manager.flutter'
-version '6.56.3'
+version '6.56.5'
 
 buildscript {
     repositories {
