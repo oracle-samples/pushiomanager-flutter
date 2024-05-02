@@ -1,3 +1,6 @@
+## 6.56.4
+- Removed unavailable iOS API.
+
 ## 6.56.3
 - Fixed issues related to push-permission prompt in Android 13 and later.
 - Fixed issue with few APIs not returning Result object from native to dart.
