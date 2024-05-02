@@ -210,6 +210,7 @@
 			files = (
 			);
 			inputPaths = (
+				"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}",
 			);
 			name = "Thin Binary";
 			outputPaths = (
@@ -366,7 +367,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 6.56.3;
+				CURRENT_PROJECT_VERSION = 6.56.5;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = VYAKS7W7VC;
 				ENABLE_BITCODE = NO;
@@ -378,7 +379,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 6.56.3;
+				MARKETING_VERSION = 6.56.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.oraclecorp.internal.ent2.pushio5;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -505,7 +506,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 6.56.3;
+				CURRENT_PROJECT_VERSION = 6.56.5;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = VYAKS7W7VC;
 				ENABLE_BITCODE = NO;
@@ -517,7 +518,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 6.56.3;
+				MARKETING_VERSION = 6.56.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.oraclecorp.internal.ent2.pushio5;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -539,7 +540,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 6.56.3;
+				CURRENT_PROJECT_VERSION = 6.56.5;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = VYAKS7W7VC;
 				ENABLE_BITCODE = NO;
@@ -551,7 +552,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 6.56.3;
+				MARKETING_VERSION = 6.56.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.oraclecorp.internal.ent2.pushio5;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
