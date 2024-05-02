@@ -210,6 +210,7 @@
 			files = (
 			);
 			inputPaths = (
+				"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}",
 			);
 			name = "Thin Binary";
 			outputPaths = (
@@ -365,8 +366,8 @@
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 6.56.3;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 6.56.5;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = VYAKS7W7VC;
 				ENABLE_BITCODE = NO;
@@ -378,8 +379,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 6.56.3;
-				PRODUCT_BUNDLE_IDENTIFIER = com.oraclecorp.internal.ent2.pushio5;
+				MARKETING_VERSION = 6.56.5;
+				PRODUCT_BUNDLE_IDENTIFIER = com.oraclecorp.internal.ent2.pushio;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "PushIO 5";
@@ -504,10 +505,9 @@
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 6.56.3;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 6.56.5;
 				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = VYAKS7W7VC;
 				ENABLE_BITCODE = NO;
 				FLUTTER_BUILD_NAME = 6.56.3;
 				FLUTTER_BUILD_NUMBER = 6.56.3;
@@ -517,8 +517,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 6.56.3;
-				PRODUCT_BUNDLE_IDENTIFIER = com.oraclecorp.internal.ent2.pushio5;
+				MARKETING_VERSION = 6.56.5;
+				PRODUCT_BUNDLE_IDENTIFIER = com.oraclecorp.pushio.flutter;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "PushIO 5";
@@ -538,8 +538,8 @@
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 6.56.3;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 6.56.5;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = VYAKS7W7VC;
 				ENABLE_BITCODE = NO;
@@ -551,8 +551,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 6.56.3;
-				PRODUCT_BUNDLE_IDENTIFIER = com.oraclecorp.internal.ent2.pushio5;
+				MARKETING_VERSION = 6.56.5;
+				PRODUCT_BUNDLE_IDENTIFIER = com.oraclecorp.internal.ent2.pushio;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "PushIO 5";
