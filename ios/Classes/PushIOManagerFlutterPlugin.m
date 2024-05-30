@@ -271,7 +271,13 @@ return sharedInstance;
     }
     NSLog(@"setting user id %@", userId);
     [[PushIOManager sharedInstance] registerUserID:userId];
-    [self sendPluginResult:result withResponse:nil andError:nil];
+    if([userId isEqualToString:[[PushIOManager sharedInstance] getUserID]]) {
+        [self sendPluginResult:result withResponse:nil andError:nil];
+    } else {
+        NSError *error = [NSError errorWithDomain:@"PIOUserIDError" code:1001 userInfo:@{NSLocalizedDescriptionKey: NSLocalizedString(@"Failed to register UserID", nil)}];
+        [self sendPluginResult:result withResponse:nil andError:error];
+    }
+    
 }
 
 
@@ -387,6 +393,8 @@ return sharedInstance;
     [[PushIOManager sharedInstance] resetEngagementContext];
     [self sendPluginResult:result withResponse:nil andError:nil];
 }
+
+
 
 -(void)setMessageCenterEnabled:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     id value = call.arguments;
@@ -575,8 +583,16 @@ return sharedInstance;
         key = nil;
     }
 
-  [[PushIOManager sharedInstance] setStringPreference:value forKey:key];
-    [self sendPluginResult:result withResponse:nil andError:nil];
+    BOOL successful = [[PushIOManager sharedInstance] setStringPreference:value forKey:key];
+    if(successful) {
+        [self sendPluginResult:result withResponse:nil andError:nil];
+    }else {
+        
+        NSString *errorMessage =  [NSString stringWithFormat:@"Preference key: %@ value: %@ ignored. Unable to save preference.", key, value];
+        NSError *error = [NSError errorWithDomain:@"PIOPreferenceError" code:1001 userInfo:@{NSLocalizedDescriptionKey: NSLocalizedString(errorMessage, nil)}];
+        [self sendPluginResult:result withResponse:nil andError:error];
+   
+    }
 }
 
 -(void)setNumberPreference:(FlutterMethodCall *)call withResult:(FlutterResult)result {
@@ -589,8 +605,17 @@ return sharedInstance;
     if (value == (id)[NSNull null]) {
         value = nil;
     }
-    [[PushIOManager sharedInstance] setNumberPreference:value forKey:key];
-    [self sendPluginResult:result withResponse:nil andError:nil];
+    BOOL successful =  [[PushIOManager sharedInstance] setNumberPreference:value forKey:key];
+    if (successful) {
+        [self sendPluginResult:result withResponse:nil andError:nil];
+    } else {
+        
+            NSString *errorMessage =  [NSString stringWithFormat:@"Preference key: %@ value: %@ ignored. Unable to save preference.", key, value];
+            NSError *error = [NSError errorWithDomain:@"PIOPreferenceError" code:1001 userInfo:@{NSLocalizedDescriptionKey: NSLocalizedString(errorMessage, nil)}];
+            [self sendPluginResult:result withResponse:nil andError:error];
+       
+    }
+    
 
 }
 
@@ -706,7 +731,6 @@ return sharedInstance;
     BOOL isSDKConfigured = [[PushIOManager sharedInstance] isSDKConfigured];
     result(@(isSDKConfigured));
 }
-
 
 -(void)setLoggingEnabled:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     id value = call.arguments;
@@ -908,12 +932,14 @@ return sharedInstance;
 
 
 - (void)sendPluginResult:(FlutterResult)result withResponse:(NSString *)response andError:(NSError *)error  {
-    if (error) {
-        result([self flutterError:error]);
-    } else if (response) {
-        result(response);
-    } else {
-        result(nil);
+    if(result) {
+        if (error) {
+            result([self flutterError:error]);
+        } else if (response) {
+            result(response);
+        } else {
+            result(nil);
+        }
     }
 }
 

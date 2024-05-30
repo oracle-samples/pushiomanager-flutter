@@ -281,7 +281,7 @@ public class PushIOManagerFlutterPlugin
         List<PushIOPreference> preferences = mPushIOManager.getPreferences();
 
         if (preferences != null) {
-            result.success(PIOUtils.preferencesAsList(preferences));
+            result.success(PIOUtils.preferencesAsJsonArrayString(preferences));
         } else {
             result.success(null);
         }
@@ -291,7 +291,7 @@ public class PushIOManagerFlutterPlugin
         PushIOPreference preference = mPushIOManager.getPreference(call.arguments.toString());
 
         if (preference != null) {
-            result.success(PIOUtils.preferenceAsMap(preference));
+            result.success(PIOUtils.preferenceAsJsonString(preference));
         } else {
             result.success(null);
         }

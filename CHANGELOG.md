@@ -1,3 +1,6 @@
+## 6.56.6
+- Fixed issues related to incorrected success status of 'setNumberPreference' , 'setStringPreference' and 'registerUserId'
+
 ## 6.56.5
 - Removed unavailable iOS API.
 
