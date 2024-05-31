@@ -29,6 +29,7 @@ import com.pushio.manager.PIOMCMessage;
 import com.pushio.manager.PIORegionEventType;
 import com.pushio.manager.preferences.PushIOPreference;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -45,31 +46,42 @@ import java.util.TimeZone;
 @SuppressWarnings("unchecked")
 public class PIOUtils {
 
-    static List<HashMap<String, Object>> preferencesAsList(List<PushIOPreference> preferences) {
+    static String preferencesAsJsonArrayString(List<PushIOPreference> preferences) {
 
-        List<HashMap<String, Object>> preferenceList = new ArrayList<>();
+        JSONArray preferencesObject = new JSONArray();
 
         for (PushIOPreference preference : preferences) {
-            HashMap<String, Object> preferenceMap = new HashMap<>();
-            preferenceMap.put("key", preference.getKey());
-            preferenceMap.put("label", preference.getLabel());
-            preferenceMap.put("value", preference.getValue());
-            preferenceMap.put("type", preference.getType().toString());
+            JSONObject preferenceObject = new JSONObject();
 
-            preferenceList.add(preferenceMap);
+            try{
+                preferenceObject.putOpt("key", preference.getKey());
+                preferenceObject.put("label", preference.getLabel());
+                preferenceObject.put("value", preference.getValue());
+                preferenceObject.putOpt("type", preference.getType().toString());
+
+                preferencesObject.put(preferenceObject);
+            }catch(JSONException e){
+                PIOLogger.v("FL pAJAS "+e);
+            }
         }
 
-        return preferenceList;
+        return preferencesObject.toString();
     }
 
-    static HashMap<String, Object> preferenceAsMap(PushIOPreference preference) {
-        HashMap<String, Object> preferenceMap = new HashMap<>();
-        preferenceMap.put("key", preference.getKey());
-        preferenceMap.put("label", preference.getLabel());
-        preferenceMap.put("value", preference.getValue());
-        preferenceMap.put("type", preference.getType().toString());
+    static String preferenceAsJsonString(PushIOPreference preference) {
+        JSONObject preferenceObject = new JSONObject();
 
-        return preferenceMap;
+        try{
+            preferenceObject.putOpt("key", preference.getKey());
+            preferenceObject.put("label", preference.getLabel());
+            preferenceObject.put("value", preference.getValue());
+            preferenceObject.putOpt("type", preference.getType().toString());
+        }catch (JSONException e){
+            PIOLogger.v("FL pAJS "+e);
+            return null;
+        }
+
+        return preferenceObject.toString();
     }
 
     static List<HashMap<String, Object>> messageCenterMessagesAsList(List<PIOMCMessage> messages) {

@@ -390,7 +390,7 @@ PushIOManager.setNotificationDeepLinkHandler((String url) {
 
 ```
 
-2024
+
 
 ## Support
 

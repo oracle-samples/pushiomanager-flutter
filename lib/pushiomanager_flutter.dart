@@ -141,6 +141,7 @@ class PushIOManager {
         .invokeMethod('setNumberPreference', {"key": key, "value": value});
   }
 
+  @Deprecated("Deprecating setBoolean Preference")
   static Future<void> setBooleanPreference(String key, bool value) async {
     return await _channel
         .invokeMethod('setBooleanPreference', {"key": key, "value": value});

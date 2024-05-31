@@ -252,14 +252,35 @@ public class PushIOManagerFlutterPlugin
     }
 
     private void registerUserId(MethodCall call, Result result) {
-        final String userId = call.arguments();
-        mPushIOManager.registerUserId(userId);
-        result.success(null);
+        final String newUserId = call.arguments();
+
+        if (TextUtils.isEmpty(newUserId)) {
+            result.error("UserId is null empty", null, null);
+            return;
+        }
+
+        mPushIOManager.registerUserId(newUserId);
+
+        final String userId = mPushIOManager.getRegisteredUserId();
+
+        if(!TextUtils.isEmpty(userId) && userId.equalsIgnoreCase(newUserId) ){
+            result.success(null);
+        } else {
+            result.error("Unable to save UserId", null, null);
+        }
     }
 
     private void unregisterUserId(MethodCall call, Result result) {
+        
         mPushIOManager.unregisterUserId();
-        result.success(null);
+
+        final String userId = mPushIOManager.getRegisteredUserId();
+
+        if (TextUtils.isEmpty(userId)) {
+            result.success(null);
+        } else {
+            result.error("Unable to clear UserId", null, null);
+        }
     }
 
     private void declarePreference(MethodCall call, Result result) {
@@ -281,7 +302,7 @@ public class PushIOManagerFlutterPlugin
         List<PushIOPreference> preferences = mPushIOManager.getPreferences();
 
         if (preferences != null) {
-            result.success(PIOUtils.preferencesAsList(preferences));
+            result.success(PIOUtils.preferencesAsJsonArrayString(preferences));
         } else {
             result.success(null);
         }
@@ -291,7 +312,7 @@ public class PushIOManagerFlutterPlugin
         PushIOPreference preference = mPushIOManager.getPreference(call.arguments.toString());
 
         if (preference != null) {
-            result.success(PIOUtils.preferenceAsMap(preference));
+            result.success(PIOUtils.preferenceAsJsonString(preference));
         } else {
             result.success(null);
         }
@@ -302,8 +323,13 @@ public class PushIOManagerFlutterPlugin
         final String value = call.argument("value");
 
         try {
-            mPushIOManager.setPreference(key, value);
-            result.success(null);
+            boolean prefResult = mPushIOManager.setPreference(key, value);
+
+            if (prefResult) {
+                result.success(null);
+            } else {
+                result.error("Unable to save preference", null, null);
+            }
         } catch (ValidationException e) {
             result.error(e.getMessage(), null, null);
         }
@@ -313,19 +339,26 @@ public class PushIOManagerFlutterPlugin
         final String key = call.argument("key");
         final Object value = call.argument("value");
 
+        boolean prefResult = false;
+
         try {
             if (value instanceof Integer) {
-                mPushIOManager.setPreference(key, (Integer) value);
+                prefResult = mPushIOManager.setPreference(key, (Integer) value);
             } else if (value instanceof Long) {
-                mPushIOManager.setPreference(key, (Long) value);
+                prefResult = mPushIOManager.setPreference(key, (Long) value);
             } else if (value instanceof Double) {
-                mPushIOManager.setPreference(key, (Double) value);
+                prefResult = mPushIOManager.setPreference(key, (Double) value);
             } else {
                 result.error("Not a Number", null, null);
                 return;
             }
 
-            result.success(null);
+            if (prefResult) {
+                result.success(null);
+            } else {
+                result.error("Unable to save preference", null, null);
+            }
+
         } catch (ValidationException e) {
             result.error(e.getMessage(), null, null);
         }
@@ -344,13 +377,36 @@ public class PushIOManagerFlutterPlugin
     }
 
     private void removePreference(MethodCall call, Result result) {
-        mPushIOManager.removePreference(call.arguments.toString());
-        result.success(null);
+
+        final String key = call.arguments.toString();
+
+        if (TextUtils.isEmpty(key)) {
+            result.error("Unable to remove preference: Key is null", null, null);
+            return;
+        }
+
+        mPushIOManager.removePreference(key);
+
+        PushIOPreference preference = mPushIOManager.getPreference(key);
+
+        if (preference == null) {
+            result.success(null);
+        } else {
+            result.error("Unable to remove preference", null, null);
+        }
     }
 
     private void clearAllPreferences(MethodCall call, Result result) {
+        
         mPushIOManager.clearAllPreferences();
-        result.success(null);
+
+        List<PushIOPreference> preferences = mPushIOManager.getPreferences();
+
+        if (preferences == null || preferences.isEmpty()) {
+            result.success(null);
+        } else {
+            result.error("Unable to clear preferences", null, null);
+        }
     }
 
     private void trackEvent(MethodCall call, Result result) {
