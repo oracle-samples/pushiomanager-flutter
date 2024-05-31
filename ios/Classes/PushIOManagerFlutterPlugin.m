@@ -631,8 +631,14 @@ return sharedInstance;
 
 -(void)clearAllPreferences:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     [[PushIOManager sharedInstance] clearAllPreferences];
-    [self sendPluginResult:result withResponse:nil andError:nil];
-
+    
+    NSArray *allPrefrences = [[PushIOManager sharedInstance] getPreferences];
+    
+    if(allPrefrences == nil || allPrefrences.count == 0) {
+        [self sendPluginResult:result withResponse:nil andError:nil];
+    } else {
+        [self sendPluginResult:result withResponse:nil andError:[NSError errorWithDomain:@"PIOPreferenceError" code:1001 userInfo:@{NSLocalizedDescriptionKey: NSLocalizedString(@"Unable to clear preferences", nil)}]];
+    }
 }
                                    
                                        
