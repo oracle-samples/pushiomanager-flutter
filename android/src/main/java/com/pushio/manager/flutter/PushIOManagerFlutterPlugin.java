@@ -402,7 +402,7 @@ public class PushIOManagerFlutterPlugin
 
         List<PushIOPreference> preferences = mPushIOManager.getPreferences();
 
-        if (preferences == null) {
+        if (preferences == null || preferences.isEmpty()) {
             result.success(null);
         } else {
             result.error("Unable to clear preferences", null, null);
