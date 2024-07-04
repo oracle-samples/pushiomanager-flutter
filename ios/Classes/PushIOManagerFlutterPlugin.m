@@ -185,14 +185,6 @@ return sharedInstance;
         [self resetAllData:call withResult:result];
     } else if ([@"isResponsysPush" isEqualToString:call.method]) {
         [self isResponsysPush:call withResult:result];
-    } else if ([@"onGeoRegionEntered" isEqualToString:call.method]) {
-        [self onGeoRegionEntered:call withResult:result];
-    } else if ([@"onGeoRegionExited" isEqualToString:call.method]) {
-        [self onGeoRegionExited:call withResult:result];
-    } else if ([@"onBeaconRegionEntered" isEqualToString:call.method]) {
-        [self onBeaconRegionEntered:call withResult:result];
-    } else if ([@"onBeaconRegionExited" isEqualToString:call.method]) {
-        [self onBeaconRegionExited:call withResult:result];
     } else if ([@"handleMessage" isEqualToString:call.method]) {
         [self handleMessage:call withResult:result];
     } else if ([@"frameworkVersion" isEqualToString:call.method]) {
@@ -840,91 +832,6 @@ return sharedInstance;
     result(@([[PushIOManager sharedInstance] isResponsysPayload:message]));
 }
 
--(void)onGeoRegionEntered:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    NSDictionary *region = call.arguments;
-    if (region == (id)[NSNull null]) {
-        region = nil;
-    }
-
-    PIOGeoRegion *geoRegion = [region geoRegion];
-    NSMutableDictionary *responseDictionary = [NSMutableDictionary dictionary];
-    responseDictionary[@"regionType"] = @"GEOFENCE_ENTRY";
-    responseDictionary[@"regionID"] = geoRegion.geofenceId;
-
-    [[PushIOManager sharedInstance] didEnterGeoRegion:geoRegion completionHandler:^(NSError *error, NSString *response) {
-        if (error) {
-            result([self flutterError:error]);
-        } else {
-            result(responseDictionary);
-        }
-    }];
-}
-
-
--(void)onGeoRegionExited:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    NSDictionary *region = call.arguments;
-    if (region == (id)[NSNull null]) {
-        region = nil;
-    }
-
-    PIOGeoRegion *geoRegion = [region geoRegion];
-    NSMutableDictionary *responseDictionary = [NSMutableDictionary dictionary];
-    responseDictionary[@"regionType"] = @"GEOFENCE_EXIT";
-    responseDictionary[@"regionID"] = geoRegion.geofenceId;
-
-    [[PushIOManager sharedInstance] didExitGeoRegion:[region geoRegion] completionHandler:^(NSError *error, NSString *response) {
-        if (error) {
-            result([self flutterError:error]);
-        } else {
-            result(responseDictionary);
-        }
-    }];
-}
-
-
--(void)onBeaconRegionEntered:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    NSDictionary *region = call.arguments;
-    if (region == (id)[NSNull null]) {
-        region = nil;
-    }
-
-    PIOBeaconRegion *beaconRegion = [region beaconRegion];
-    NSMutableDictionary *responseDictionary = [NSMutableDictionary dictionary];
-    responseDictionary[@"regionType"] = @"BEACON_ENTRY";
-    responseDictionary[@"regionID"] = beaconRegion.beaconId;
-
-    [[PushIOManager sharedInstance] didEnterBeaconRegion:[region beaconRegion] completionHandler:^(NSError *error, NSString *response) {
-        if (error) {
-            result([self flutterError:error]);
-        } else {
-            result(responseDictionary);
-        }
-    }];
-}
--(void)onBeaconRegionExited:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    NSDictionary *region = call.arguments;
-    if (region == (id)[NSNull null]) {
-        region = nil;
-    }
-
-    PIOBeaconRegion *beaconRegion = [region beaconRegion];
-    NSMutableDictionary *responseDictionary = [NSMutableDictionary dictionary];
-    responseDictionary[@"regionType"] = @"BEACON_EXIT";
-    responseDictionary[@"regionID"] = beaconRegion.beaconId;
-
-    
-    [[PushIOManager sharedInstance] didExitBeaconRegion:[region beaconRegion] completionHandler:^(NSError *error, NSString *response) {
-        if (error) {
-            result([self flutterError:error]);
-        } else {
-            result(responseDictionary);
-        }
-    }];
-}
-
-- (void)setLastLocation:(CLLocation *)lastLocation {
-    
-}
 
 -(void)handleMessage:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     [self sendPluginResult:result withResponse:nil andError:nil];

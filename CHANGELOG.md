@@ -1,3 +1,7 @@
+## 6.56.7
+- Location Support is removed in iOS
+
+
 ## 6.56.6
 - Fixed issues related to incorrected success status of 'setNumberPreference' , 'setStringPreference' and 'registerUserId'
 
