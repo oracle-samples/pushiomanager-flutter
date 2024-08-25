@@ -5,11 +5,13 @@
 */
 
 #import "PushIOManagerFlutterPlugin.h"
-#import <PushIOManager/PushIOManagerAll.h>
+#import <CX_Mobile_SDK/CX_Mobile_SDK.h>
 #import "NSDictionary+PIOConvert.h"
 #import "NSArray+PIOConvert.h"
 #import <UserNotifications/UserNotifications.h>
 #import <UIKit/UIKit.h>
+
+
 
 @interface PushIOManagerFlutterPlugin ()<PIODeepLinkDelegate>
 @property (strong, nonatomic) FlutterMethodChannel *channel;
@@ -232,7 +234,10 @@ return sharedInstance;
 
 - (void)registerApp:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     NSError *error;
-    [[PushIOManager sharedInstance] registerApp:&error completionHandler:^(NSError *error, NSString *response) {
+    BOOL useLocation = (BOOL) call.arguments;
+    
+    
+    [[PushIOManager sharedInstance] registerApp:&error useLocation:useLocation completionHandler:^(NSError *error, NSString *response) {
         [self sendPluginResult:result withResponse:response andError:error];
     }];
 }
@@ -318,6 +323,9 @@ return sharedInstance;
     if (filename == (id)[NSNull null]) {
         filename = nil;
     }
+    
+    BOOL useLocation = call.arguments[@"userLocation"];
+
 
     NSLog(@"configureWithFilename %@", filename);
     [[PushIOManager sharedInstance] configureWithFileName:filename completionHandler:^(NSError *configError, NSString *response) {
@@ -336,7 +344,7 @@ return sharedInstance;
                 
                 //6. Register application with Responsys server. This API is responsible to send registration signal to Responsys server. This API sends all the values configured on SDK to server.
                 NSError *regTrackError = nil;
-                [[PushIOManager sharedInstance] registerApp:&regTrackError completionHandler:^(NSError *regAppError, NSString *response) {
+                [[PushIOManager sharedInstance] registerApp:&regTrackError useLocation:useLocation completionHandler:^(NSError *regAppError, NSString *response) {
                     if (nil == regAppError) {
                         NSLog(@"Application registered successfully!");
                     } else {
