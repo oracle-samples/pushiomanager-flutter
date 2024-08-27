@@ -6,12 +6,11 @@
 
 #import "PushIOManagerFlutterPlugin.h"
 #import <CX_Mobile_SDK/CX_Mobile_SDK.h>
+#import <CX_Mobile_SDK/ORACoreConfig.h>
 #import "NSDictionary+PIOConvert.h"
 #import "NSArray+PIOConvert.h"
 #import <UserNotifications/UserNotifications.h>
 #import <UIKit/UIKit.h>
-
-
 
 @interface PushIOManagerFlutterPlugin ()<PIODeepLinkDelegate>
 @property (strong, nonatomic) FlutterMethodChannel *channel;
@@ -24,6 +23,10 @@ static PushIOManagerFlutterPlugin *sharedInstance = nil;
 static dispatch_once_t onceToken;
 dispatch_once(&onceToken, ^{
     sharedInstance = [PushIOManagerFlutterPlugin new];
+    
+    ORACoreConfig *config = [[ORACoreConfig alloc] init];
+    [config setConfigValue:@"rsys" forKey:kORAModules];
+    
     [sharedInstance setUpDeeplinkHandler];
 });
 return sharedInstance;
