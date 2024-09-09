@@ -479,45 +479,30 @@ class PushIOManager {
 
   static Future<Map<String, String>> onGeoRegionEntered(
       GeoRegion region) async {
-    if (Platform.isAndroid) {
-      Map<dynamic, dynamic> response =
+    Map<dynamic, dynamic> response =
           await _channel.invokeMethod('onGeoRegionEntered', region.toJson());
       return response.cast<String, String>();
-    } else {
-      throw PlatformException(code: "API not supported");
-    }
   }
 
   static Future<Map<String, String>> onGeoRegionExited(GeoRegion region) async {
-    if (Platform.isAndroid) {
       Map<dynamic, dynamic> response =
           await _channel.invokeMethod('onGeoRegionExited', region.toJson());
       return response.cast<String, String>();
-    } else {
-      throw PlatformException(code: "API not supported");
-    }
+    
   }
 
   static Future<Map<String, String>> onBeaconRegionEntered(
       BeaconRegion region) async {
-    if (Platform.isAndroid) {
       Map<dynamic, dynamic> response =
           await _channel.invokeMethod('onBeaconRegionEntered', region.toJson());
       return response.cast<String, String>();
-    } else {
-      throw PlatformException(code: "API not supported");
-    }
   }
 
   static Future<Map<String, String>> onBeaconRegionExited(
       BeaconRegion region) async {
-    if (Platform.isAndroid) {
       Map<dynamic, dynamic> response = await (_channel.invokeMethod(
           'onBeaconRegionExited', region.toJson()));
       return response.cast<String, String>();
-    } else {
-      throw PlatformException(code: "API not supported");
-    }
   }
 
   static Future<bool?> getExecuteRsysWebUrl() async {

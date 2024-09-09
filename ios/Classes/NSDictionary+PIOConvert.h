@@ -17,6 +17,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (UIButton *)customCloseButton;
 + (NSDictionary *)dictionaryFromPreference:(PIOPreference *)preference;
 - (NSString *)JSON;
+- (PIOGeoRegion *)geoRegion;
+- (PIOBeaconRegion *)beaconRegion;
 @end
 
 NS_ASSUME_NONNULL_END

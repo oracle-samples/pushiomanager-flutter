@@ -214,6 +214,14 @@ return sharedInstance;
         [self isStatusBarHiddenForIAMBannerInterstitial:call withResult:result];
     }else if ([@"setInAppCustomCloseButton" isEqualToString:call.method]) {
         [self setInAppCustomCloseButton:call withResult:result];
+    } else if ([@"onGeoRegionEntered" isEqualToString:call.method]) {
+        [self didEnterGeoRegion:call withResult:result];
+    } else if ([@"onGeoRegionExited" isEqualToString:call.method]) {
+        [self didExitGeoRegion:call withResult:result];
+    } else if ([@"onBeaconRegionEntered" isEqualToString:call.method]) {
+        [self didEnterBeaconRegion:call withResult:result];
+    } else if ([@"onBeaconRegionExited" isEqualToString:call.method]) {
+        [self didExitBeaconRegion:call withResult:result];
     }
      else {
         result(FlutterMethodNotImplemented);
@@ -1071,6 +1079,102 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
         [self.channel invokeMethod:@"onMessageCenterUpdate" arguments:mcString];
     }
 }
+
+-(void)didEnterGeoRegion:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    
+    id value = call.arguments;
+    if (value == (id)[NSNull null]) {
+        value = nil;
+    }
+    PIOGeoRegion *region = [(NSDictionary *)value geoRegion];
+    
+    [[PushIOManager sharedInstance] didEnterGeoRegion:region completionHandler:^(NSError * _Nullable error, NSString * _Nullable response) {
+        if(error == nil) {
+            
+            NSMutableDictionary *responseDictionary = [NSMutableDictionary dictionary];
+            responseDictionary[@"regionType"] = @"GEOFENCE_ENTRY";
+            responseDictionary[@"regionID"] = region.geofenceId;
+            
+            result(responseDictionary);
+            
+        } else {
+            [self sendPluginResult:result withResponse:region.geofenceId andError:error];
+        }
+        
+        
+    }];
+}
+
+-(void)didExitGeoRegion:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    
+    id value = call.arguments;
+    if (value == (id)[NSNull null]) {
+        value = nil;
+    }
+    PIOGeoRegion *region = [(NSDictionary *)value geoRegion];
+    
+    [[PushIOManager sharedInstance] didExitGeoRegion:region completionHandler:^(NSError * _Nullable error, NSString * _Nullable response) {
+        
+        if(error == nil) {
+            NSMutableDictionary *responseDictionary = [NSMutableDictionary dictionary];
+            responseDictionary[@"regionType"] = @"GEOFENCE_EXIT";
+            responseDictionary[@"regionID"] = region.geofenceId;
+            result(responseDictionary);
+        } else {
+            
+            [self sendPluginResult:result withResponse:region.geofenceId andError:error];
+        }
+        
+    }];
+}
+
+-(void)didEnterBeaconRegion:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    
+    id value = call.arguments;
+    if (value == (id)[NSNull null]) {
+        value = nil;
+    }
+    PIOBeaconRegion* region = [(NSDictionary *)value beaconRegion];
+    
+    
+    
+    [[PushIOManager sharedInstance] didEnterBeaconRegion:region completionHandler:^(NSError * _Nullable error, NSString * _Nullable response) {
+        if(error == nil) {
+            
+            NSMutableDictionary *responseDictionary = [NSMutableDictionary dictionary];
+            responseDictionary[@"regionType"] = @"BEACON_ENTRY";
+            responseDictionary[@"regionID"] = region.beaconId;
+            result(responseDictionary);
+            
+        } else {
+            [self sendPluginResult:result withResponse:region.beaconId andError:error];
+        }
+        
+    }];
+}
+
+
+-(void)didExitBeaconRegion:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    
+    id value = call.arguments;
+    if (value == (id)[NSNull null]) {
+        value = nil;
+    }
+    PIOBeaconRegion* region = [(NSDictionary *)value beaconRegion];
+    
+    [[PushIOManager sharedInstance] didExitBeaconRegion:region completionHandler:^(NSError * _Nullable error, NSString * _Nullable response) {
+        if(error == nil) {
+            NSMutableDictionary *responseDictionary = [NSMutableDictionary dictionary];
+            responseDictionary[@"regionType"] = @"BEACON_EXIT";
+            responseDictionary[@"regionID"] = region.beaconId;
+            result(responseDictionary);
+        }  else {
+            [self sendPluginResult:result withResponse:region.beaconId andError:error];
+        }
+        
+    }];
+}
+
 
 
                
