@@ -1018,7 +1018,16 @@ public class PushIOManagerFlutterPlugin
                 response.put("deeplinkUrl", deeplinkUrl);
                 response.put("weblinkUrl", weblinkUrl);
 
-                channel.invokeMethod("setIAMUrlResolveLinkHandler", response);
+                if(mActivity != null) {
+                    mUIThreadHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            channel.invokeMethod("setIAMUrlResolveLinkHandler", response);
+                        }
+                    });
+                }else{
+                    PIOLogger.v("PIOFP sERWU mActivity is null");
+                }
             }
 
             @Override
@@ -1056,7 +1065,12 @@ public class PushIOManagerFlutterPlugin
                 response.put("deeplinkUrl", deeplinkUrl);
                 response.put("weblinkUrl", webLinkUrl);
 
-                channel.invokeMethod("setAppOpenLinkHandler", response);
+                mUIThreadHandler.post(new Runnable() {
+                    @Override
+                    public void run () {
+                        channel.invokeMethod("setAppOpenLinkHandler", response);
+                    }
+                });
             }
         });
     }

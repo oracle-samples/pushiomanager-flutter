@@ -6,18 +6,18 @@
 library pushiomanager_flutter;
 
 import 'dart:async';
-import 'dart:io';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/services.dart';
 import 'package:pushiomanager_flutter/beacon_region.dart';
 import 'package:pushiomanager_flutter/conversion_event.dart';
+import 'package:pushiomanager_flutter/custom_close_button.dart';
 import 'package:pushiomanager_flutter/geo_region.dart';
 import 'package:pushiomanager_flutter/interactive_notification.dart';
 import 'package:pushiomanager_flutter/messagecenter_message.dart';
 import 'package:pushiomanager_flutter/preference.dart';
 import 'package:pushiomanager_flutter/utils.dart';
-import 'package:pushiomanager_flutter/custom_close_button.dart';
 
 typedef void NotificationDeepLinkHandler(String? url);
 
@@ -165,6 +165,7 @@ class PushIOManager {
       String messageCenter) async {
     List? messages = await _channel.invokeMethod(
         'fetchMessagesForMessageCenter', messageCenter);
+
     if (messages == null) return null;
 
     return messages.map((dynamic payload) {
@@ -480,29 +481,28 @@ class PushIOManager {
   static Future<Map<String, String>> onGeoRegionEntered(
       GeoRegion region) async {
     Map<dynamic, dynamic> response =
-          await _channel.invokeMethod('onGeoRegionEntered', region.toJson());
-      return response.cast<String, String>();
+        await _channel.invokeMethod('onGeoRegionEntered', region.toJson());
+    return response.cast<String, String>();
   }
 
   static Future<Map<String, String>> onGeoRegionExited(GeoRegion region) async {
-      Map<dynamic, dynamic> response =
-          await _channel.invokeMethod('onGeoRegionExited', region.toJson());
-      return response.cast<String, String>();
-    
+    Map<dynamic, dynamic> response =
+        await _channel.invokeMethod('onGeoRegionExited', region.toJson());
+    return response.cast<String, String>();
   }
 
   static Future<Map<String, String>> onBeaconRegionEntered(
       BeaconRegion region) async {
-      Map<dynamic, dynamic> response =
-          await _channel.invokeMethod('onBeaconRegionEntered', region.toJson());
-      return response.cast<String, String>();
+    Map<dynamic, dynamic> response =
+        await _channel.invokeMethod('onBeaconRegionEntered', region.toJson());
+    return response.cast<String, String>();
   }
 
   static Future<Map<String, String>> onBeaconRegionExited(
       BeaconRegion region) async {
-      Map<dynamic, dynamic> response = await (_channel.invokeMethod(
-          'onBeaconRegionExited', region.toJson()));
-      return response.cast<String, String>();
+    Map<dynamic, dynamic> response =
+        await (_channel.invokeMethod('onBeaconRegionExited', region.toJson()));
+    return response.cast<String, String>();
   }
 
   static Future<bool?> getExecuteRsysWebUrl() async {

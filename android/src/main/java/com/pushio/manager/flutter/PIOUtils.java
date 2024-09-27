@@ -98,6 +98,7 @@ public class PIOUtils {
             messageMap.put("richMessageURL", message.getRichMessageUrl());
             messageMap.put("sentTimestamp", getDateAsString(message.getSentTimestamp()));
             messageMap.put("expiryTimestamp", getDateAsString(message.getExpiryTimestamp()));
+            messageMap.put("customKeyValuePairs", message.getCustomKeyValue());
 
             messageList.add(messageMap);
         }
