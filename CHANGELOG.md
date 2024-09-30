@@ -1,3 +1,8 @@
+## 7.0.0
+- This version merges the functionality of Responsys, CX Core and CX Analytics SDKs. 
+IMPORTANT: Please check the Upgrade documentation on how to integrate this new version
+
+
 ## 6.56.7
 - Location Support is removed in iOS
 

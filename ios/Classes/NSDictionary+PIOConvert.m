@@ -159,4 +159,42 @@
     return hexComponent / 255.0;
 }
 
+- (PIOGeoRegion *)geoRegion {
+    NSString *geofenceId =  self[@"geofenceId" ];
+    NSString *geofenceName =  self[@"geofenceName" ];
+    double speed = [(NSString *)self[@"speed"] doubleValue];
+    double bearing = [(NSString *)self[@"bearing"] doubleValue];
+    NSString *zoneId =  self[@"zoneId"];
+    NSString *zoneName =  self[@"zoneName"];
+    NSString *source =  self[@"source"];
+    NSInteger dwellTime =  [(NSString *)self[@"dwellTime"] integerValue];
+    NSDictionary *extra = self[@"extra"];
+
+    PIOGeoRegion *geoRegion = [[PIOGeoRegion alloc] initWithGeofenceId:geofenceId geofenceName:geofenceName speed:speed bearing:bearing source:source zoneId:zoneId zoneName:zoneName dwellTime:dwellTime extra:extra];
+    
+    return geoRegion;
+}
+
+- (PIOBeaconRegion *)beaconRegion {
+    NSString *iBeaconUUID =  self[@"iBeaconUUID"];
+    NSInteger iBeaconMajor =  [(NSString *)self[@"iBeaconMajor"] integerValue];
+    NSInteger iBeaconMinor =  [(NSString *)self[@"iBeaconMinor"] integerValue];
+    NSString *beaconId =  self[@"beaconId"];
+    NSString *beaconName =  self[@"beaconName"];
+    NSString *beaconTag =  self[@"beaconTag"];
+    NSString *proximity =  self[@"proximity"];
+    NSString *zoneId =  self[@"zoneId"];
+    NSString *zoneName =  self[@"zoneName"];
+    NSString *source =  self[@"source" ];
+    NSInteger dwellTime =  [(NSString *) self[@"dwellTime" ] integerValue];
+    NSDictionary *extra = self[@"extra"];
+    NSString *eddyStoneId1 =  self[@"eddyStoneId1"];
+    NSString *eddyStoneId2 =  self[@"eddyStoneId2"];
+    PIOBeaconRegion *beaconRegion = [[PIOBeaconRegion alloc] initWithiBeaconUUID:iBeaconUUID iBeaconMajor:iBeaconMajor iBeaconMinor:iBeaconMinor beaconId:beaconId beaconName:beaconName beaconTag:beaconTag proximity:proximity source:source zoneId:zoneId zoneName:zoneName dwellTime:dwellTime extra:extra];
+    beaconRegion.eddyStoneId1 = eddyStoneId1;
+    beaconRegion.eddyStoneId2 = eddyStoneId2;
+    
+    return beaconRegion;
+}
+
 @end

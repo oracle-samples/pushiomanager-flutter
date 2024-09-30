@@ -9,6 +9,7 @@ This plugin makes it easy to integrate the Responsys Mobile SDK with your Flutte
 - [Setup](#setup)
   * [For Android](#for-android-1)
   * [For iOS](#for-ios-1)
+  		* [Location SDK](#location-sdk)
 - [Installation](#installation)
 - [Integration](#integration)
   * [For Android](#for-android-2)
@@ -25,6 +26,7 @@ This plugin makes it easy to integrate the Responsys Mobile SDK with your Flutte
 - [Support](#support)
 - [License](#license)
 
+<br/>
 
 ## Requirements
 
@@ -36,9 +38,13 @@ This plugin makes it easy to integrate the Responsys Mobile SDK with your Flutte
 ### For iOS
 - iOS 12 or later
 
+<br/>
+
 ## Setup
 
 Before installing the plugin, you must setup your app to receive push notifications.
+
+<br/>
 
 ### For Android
 - [Get FCM Credentials](https://docs.oracle.com/en/cloud/saas/marketing/responsys-develop-mobile/android/fcm-credentials.htm) 
@@ -50,7 +56,10 @@ Before installing the plugin, you must setup your app to receive push notificati
 
 	```gradle
 	configurations.maybeCreate("default")
-	artifacts.add("default", file('PushIOManager-6.56.3.aar'))
+	artifacts.add("default", file('oracle-cx-mobile-base-7.0.1.aar'))
+
+	//Optional
+	//artifacts.add("default", file('oracle-cx-mobile-location-7.0.0.aar'))
 	```		
 
 - Add the following to your project-wide `settings.gradle` file:
@@ -59,16 +68,72 @@ Before installing the plugin, you must setup your app to receive push notificati
 	include ':PushIOManager'
 	project(':PushIOManager').projectDir = new File(rootProject.projectDir, './PushIOManager')
 	```
-
+<br/>
 
 ### For iOS
 - [Generate Auth Key](https://docs.oracle.com/en/cloud/saas/marketing/responsys-develop-mobile/ios/auth-key/) 
 - Log in to the [Responsys Mobile App Developer Console](https://docs.oracle.com/en/cloud/saas/marketing/responsys-develop-mobile/dev-console/login/) and enter your Auth Key and other details for your iOS app.
 - Download the `pushio_config.json` file generated from your credentials.
 - Download the SDK binary from [here](https://www.oracle.com/downloads/applications/cx/responsys-mobile-sdk.html).
-- After adding the plugin in your app, copy `PushIOManager.xcframework` and place it in the plugin ios directory - `pushiomanager-flutter/ios/`. 
-- Run `pod install` in the `your_app_directory/ios/` directory, after adding the plugin in to your app and copying `PushIOManager.xcframework` in  `pushiomanager-flutter/ios/` directory. 
+- After adding the plugin in your app, copy `CX_Mobile_SDK.xcframework` and place it in the plugin ios directory - `pushiomanager-flutter/ios/`. Make sure to remove the `PushIOManager.xcframework` if previously copied to this path
+
 ![framework Image](./img/ios_framework.png "framework Image")
+
+- Run `pod install` in the `your_app_directory/ios/` directory.
+
+
+
+#### Location SDK
+
+Now the Location APIs are part of `OracleCXLocationSDK.xcframework`.  If app developer need to track the location info only then app need to include the location API in the app and then follow the App Store guideline.
+
+##### Setup
+  - After adding the plugin in your app, copy `OracleCXLocationSDK.xcframework` and place it in the plugin ios directory - `pushiomanager-flutter/ios/`. 
+  - App Developers need to update authorization level of access for Location authorization request. add related Privacy Location descriptiions in Info.plist of xcode project, refer this for more info [Location Descriptions](https://developer.apple.com/documentation/corelocation/requesting-authorization-to-use-location-services#Provide-descriptions-of-how-you-use-location-services)
+
+
+ ```xml
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Add description for background location usage</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Add description for foreground only location usage.</string>
+```
+
+- The flutter `permission_handler` plugin use macros to control whether a permission is enabled. App Developers must list the permission want to use in  application. refer this for more information [permission_handler](https://pub.dev/packages/permission_handler)
+       * Add the following to your Podfile file:
+
+	
+	  ```text
+	   post_install do |installer|
+  	   	installer.pods_project.targets.each do |target|
+       		flutter_additional_ios_build_settings(target)
+    			target.build_configurations.each do |config|
+						## You can remove unused permissions here
+      					## for more information: https://github.com/BaseflowIT/flutter-permission-handler/blob/master/permission_handler/ios/Classes/PermissionHandlerEnums.h
+
+      					config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= [
+        				'$(inherited)',
+
+        				## The 'PERMISSION_LOCATION' macro enables the `locationWhenInUse` and `locationAlways` permission. If
+        				## the application only requires `locationWhenInUse`, only specify the `PERMISSION_LOCATION_WHENINUSE`
+       				    ## macro.
+        				##
+       					## dart: [PermissionGroup.location, PermissionGroup.locationAlways, PermissionGroup.locationWhenInUse]
+        				'PERMISSION_LOCATION=1',
+        				'PERMISSION_LOCATION_WHENINUSE=0'
+      					] 
+	  			end
+  	  	end	
+	  end
+		```
+
+
+
+- In iOS, the registration API accept boolean input for Location. refer   [Configure And Register](#configure-and-register) for Register API implementation.
+		* true - `OracleCXLocationSDK.xcframework` request for Location authorization and  Location permission popup will be displayed to user.
+		* false -  SDK will not use Location and Location pop will not be displayed to user.
+
+<br/>
 
 ## Installation
 
@@ -214,11 +279,15 @@ import 'package:pushiomanager_flutter/pushiomanager_flutter.dart';
    			.catchError((error) => print("Registration error: $error"));
   	} else if (Platform.isIOS) {
       PushIOManager.registerForAllRemoteNotificationTypes().then((_) => { 
-        PushIOManager.registerApp() 
+        PushIOManager.registerApp(useLocation: true) 
       }).then((_) => print("Registration Successful"))
           .catchError((error) => print("Registration error: $error"));
     }  	
    ```
+   - For iOS Register API, registerApp will have boolean input which will used to pass Location Attributes in Registration Payload,
+      * true - SDK will use Core Location and Location permission popup will be displayed to user only if `OracleCXLocationSDK.xcframework` copied to ios folder.
+	  * false -  SDK will not use Location and Location pop will not be displayed to user.
+
 
 
 ### User Identification
@@ -260,16 +329,22 @@ IAM can also be displayed on-demand using custom triggers.
 	PushIOManager.trackEvent("custom_event_name");
 	```
 
+#### For iOS
+
+These below steps are required for iOS In-App Messages.
+
+  * To Enable Custom URI scheme for displaying In-App Messages and Rich Push content follow the [Step 1](https://docs.oracle.com/en/cloud/saas/marketing/responsys-develop-mobile/ios/in-app-msg.htm).
+  You can find the API key in the `pushio_config.json` that was placed in your Xcode project earlier during setup.
+  
+  * Follow  [Step 2](https://docs.oracle.com/en/cloud/saas/marketing/responsys-develop-mobile/ios/in-app-msg.htm) to add the required capabilities in your Xcode project for In-App messages.
 
 ### Message Center
 
 - Get the Message Center messages list using,
-```
+
 Each Message Center message now supports an additional property called custom key-value pairs, it is a variable sized object with key value pairs and can be accessed like any other property of that message.
 
-```
-
-	```dart
+```dart
 	PushIOManager.fetchMessagesForMessageCenter("Primary")
 		.then((messages) => { 
 			// messages is a list of MessageCenterMessage
@@ -280,7 +355,7 @@ Each Message Center message now supports an additional property called custom ke
             }
 		}
 	);
-	```
+```
 	
 - To get the message content call,
 
@@ -307,6 +382,24 @@ PushIOManager.onGeoRegionEntered(region)
             "$response['regionType'] with ID - $response['regionID'] successfully reported"))
     .catchError((error) =>
     	print("Unable to report \$GEOFENCE_ENTRY event: $error"));
+
+PushIOManager.onGeoRegionExited(region)
+	.then((response) => print(
+            "$response['regionType'] with ID - $response['regionID'] successfully reported"))
+    .catchError((error) =>
+    	print("Unable to report \$onGeoRegionExited event: $error"));
+
+PushIOManager.onBeaconRegionEntered(region)
+	.then((response) => print(
+            "$response['regionType'] with ID - $response['regionID'] successfully reported"))
+    .catchError((error) =>
+    	print("Unable to report \$onBeaconRegionEntered event: $error"));
+
+PushIOManager.onBeaconRegionExited(region)
+	.then((response) => print(
+            "$response['regionType'] with ID - $response['regionID'] successfully reported"))
+    .catchError((error) =>
+    	print("Unable to report \$onBeaconRegionExited event: $error"));
 ```
 
 
@@ -408,6 +501,6 @@ Please consult the [security guide](./SECURITY.md) for our responsible security 
 
 ## License
 
-Copyright (c) 2023 Oracle and/or its affiliates.
+Copyright (c) 2024 Oracle and/or its affiliates.
 Released under the Universal Permissive License v1.0 as shown at
 <https://oss.oracle.com/licenses/upl/>.

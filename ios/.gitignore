@@ -35,3 +35,12 @@ Icon?
 
 /Flutter/Generated.xcconfig
 /Flutter/flutter_export_environment.sh
+
+PushIOManager.xcframework
+PushIOManager.xcframework/*
+
+CX_Mobile_SDK.xcframework
+CX_Mobile_SDK.xcframework/*
+
+OracleCXLocationSDK.xcframework
+OracleCXLocationSDK.xcframework/*
