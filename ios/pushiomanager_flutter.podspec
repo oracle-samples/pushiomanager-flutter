@@ -22,7 +22,7 @@ Pod::Spec.new do |s|
   s.vendored_frameworks = 'CX_Mobile_SDK.xcframework','OracleCXLocationSDK.xcframework'
   s.preserve_paths 	  = "CX_Mobile_SDK.xcframework/**/*","OracleCXLocationSDK.xcframework/**/*"
   s.libraries               = 'sqlite3'
-  s.frameworks              = 'UserNotifications', 'CoreLocation', 'Foundation', 'UIKit'
+  s.frameworks              = 'UserNotifications', 'Foundation', 'UIKit'
   s.ios.frameworks          = 'WebKit'
 
   # Flutter.framework does not contain a i386 slice.
