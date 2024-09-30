@@ -9,6 +9,7 @@ This plugin makes it easy to integrate the Responsys Mobile SDK with your Flutte
 - [Setup](#setup)
   * [For Android](#for-android-1)
   * [For iOS](#for-ios-1)
+  		* [Location SDK](#location-sdk)
 - [Installation](#installation)
 - [Integration](#integration)
   * [For Android](#for-android-2)
@@ -25,6 +26,7 @@ This plugin makes it easy to integrate the Responsys Mobile SDK with your Flutte
 - [Support](#support)
 - [License](#license)
 
+<br/>
 
 ## Requirements
 
@@ -36,9 +38,13 @@ This plugin makes it easy to integrate the Responsys Mobile SDK with your Flutte
 ### For iOS
 - iOS 12 or later
 
+<br/>
+
 ## Setup
 
 Before installing the plugin, you must setup your app to receive push notifications.
+
+<br/>
 
 ### For Android
 - [Get FCM Credentials](https://docs.oracle.com/en/cloud/saas/marketing/responsys-develop-mobile/android/fcm-credentials.htm) 
@@ -50,7 +56,10 @@ Before installing the plugin, you must setup your app to receive push notificati
 
 	```gradle
 	configurations.maybeCreate("default")
-	artifacts.add("default", file('PushIOManager-6.56.3.aar'))
+	artifacts.add("default", file('oracle-cx-mobile-base-7.0.1.aar'))
+
+	//Optional
+	//artifacts.add("default", file('oracle-cx-mobile-location-7.0.0.aar'))
 	```		
 
 - Add the following to your project-wide `settings.gradle` file:
@@ -59,7 +68,7 @@ Before installing the plugin, you must setup your app to receive push notificati
 	include ':PushIOManager'
 	project(':PushIOManager').projectDir = new File(rootProject.projectDir, './PushIOManager')
 	```
-
+<br/>
 
 ### For iOS
 - [Generate Auth Key](https://docs.oracle.com/en/cloud/saas/marketing/responsys-develop-mobile/ios/auth-key/) 
@@ -74,27 +83,27 @@ Before installing the plugin, you must setup your app to receive push notificati
 
 
 
-### Location SDK
+#### Location SDK
 
 Now the Location APIs are part of `OracleCXLocationSDK.xcframework`.  If app developer need to track the location info only then app need to include the location API in the app and then follow the App Store guideline.
 
- #### setup
+##### Setup
   - After adding the plugin in your app, copy `OracleCXLocationSDK.xcframework` and place it in the plugin ios directory - `pushiomanager-flutter/ios/`. 
   - App Developers need to update authorization level of access for Location authorization request. add related Privacy Location descriptiions in Info.plist of xcode project, refer this for more info [Location Descriptions](https://developer.apple.com/documentation/corelocation/requesting-authorization-to-use-location-services#Provide-descriptions-of-how-you-use-location-services)
 
 
- 	```xml
+ ```xml
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>Add description for background location usage</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Add description for foreground only location usage.</string>
+```
 
-	```
-   - The flutter `permission_handler` plugin use macros to control whether a permission is enabled. App Developers must list the permission want to use in  application. refer this for more information [permission_handler](https://pub.dev/packages/permission_handler)
+- The flutter `permission_handler` plugin use macros to control whether a permission is enabled. App Developers must list the permission want to use in  application. refer this for more information [permission_handler](https://pub.dev/packages/permission_handler)
        * Add the following to your Podfile file:
 
 	
-	  ```dart
+	  ```text
 	   post_install do |installer|
   	   	installer.pods_project.targets.each do |target|
        		flutter_additional_ios_build_settings(target)
@@ -119,10 +128,12 @@ Now the Location APIs are part of `OracleCXLocationSDK.xcframework`.  If app dev
 		```
 
 
-   - In iOS, Registration API accept boolean input for Location. refer   [Configure And Register](#configure-and-register) for Register API implementation.
+
+- In iOS, the registration API accept boolean input for Location. refer   [Configure And Register](#configure-and-register) for Register API implementation.
 		* true - `OracleCXLocationSDK.xcframework` request for Location authorization and  Location permission popup will be displayed to user.
 		* false -  SDK will not use Location and Location pop will not be displayed to user.
 
+<br/>
 
 ## Installation
 
@@ -490,6 +501,6 @@ Please consult the [security guide](./SECURITY.md) for our responsible security 
 
 ## License
 
-Copyright (c) 2023 Oracle and/or its affiliates.
+Copyright (c) 2024 Oracle and/or its affiliates.
 Released under the Universal Permissive License v1.0 as shown at
 <https://oss.oracle.com/licenses/upl/>.
