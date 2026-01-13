@@ -7,7 +7,7 @@
 
 #import "NSArray+PIOConvert.h"
 #import "NSDictionary+PIOConvert.h"
-#import <CX_Mobile_SDK/CX_Mobile_SDK.h>
+#import <CXMobileSDK/CXMobileSDK.h>
 
 @implementation NSArray (PIOConvert)
 - (NSArray *)messageDictionary {
@@ -25,6 +25,8 @@
     dictionary[@"sentTimestamp"] = [self dateToString:message.sentTimestamp];
     dictionary[@"expiryTimestamp"] = [self dateToString:message.expiryTimestamp];
     dictionary[@"customKeyValuePairs"] = message.customKeyValuePairs;
+    dictionary[@"readStatus"] = message.readStatus;
+    dictionary[@"readStatusTimestamp"] = [self dateToString:message.readStatusTimestamp];
     [messages addObject:dictionary];
   }
         
