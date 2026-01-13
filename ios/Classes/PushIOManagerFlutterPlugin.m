@@ -46,6 +46,9 @@
     [registrar addApplicationDelegate:instance];
     [registrar addSceneDelegate:instance];
     
+   
+    instance.channel = flutterChannel;
+    
     if ([UNUserNotificationCenter currentNotificationCenter].delegate == nil) {
         [UNUserNotificationCenter currentNotificationCenter].delegate = instance;
     }
@@ -217,8 +220,6 @@
         [self didExitBeaconRegion:call withResult:result];
     } else if ([@"setDeviceToken" isEqualToString:call.method]) {
         [self setDeviceToken:call withResult:result];
-    }
-     else {
     }else if ([@"setMessageCenterEventTrackingEnabled" isEqualToString:call.method]) {
         [self setMessageCenterEventTrackingEnabled:call withResult:result];
     }else if ([@"isMessageCenterEventTrackingEnabled" isEqualToString:call.method]) {
