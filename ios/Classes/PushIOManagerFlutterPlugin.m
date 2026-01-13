@@ -1,12 +1,11 @@
 /**
-* Copyright © 2024, Oracle and/or its affiliates. All rights reserved.
-*
-* Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
-*/
+ * Copyright © 2026, Oracle and/or its affiliates. All rights reserved.
+ *
+ * Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
+ */
 
 #import "PushIOManagerFlutterPlugin.h"
-#import <CX_Mobile_SDK/CX_Mobile_SDK.h>
-#import <CX_Mobile_SDK/ORACoreConfig.h>
+#import <CXMobileSDK/CXMobileSDK.h>
 #import "NSDictionary+PIOConvert.h"
 #import "NSArray+PIOConvert.h"
 #import <UserNotifications/UserNotifications.h>
@@ -19,36 +18,35 @@
 
 @implementation PushIOManagerFlutterPlugin
 + (instancetype)sharedInstance {
-static PushIOManagerFlutterPlugin *sharedInstance = nil;
-static dispatch_once_t onceToken;
-dispatch_once(&onceToken, ^{
-    sharedInstance = [PushIOManagerFlutterPlugin new];
-    
-    ORACoreConfig *config = [[ORACoreConfig alloc] init];
-    [config setConfigValue:@"rsys" forKey:kORAModules];
-    
-    [sharedInstance setUpDeeplinkHandler];
-});
-return sharedInstance;
+    static PushIOManagerFlutterPlugin *sharedInstance = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        sharedInstance = [PushIOManagerFlutterPlugin new];    
+        [sharedInstance setUpDeeplinkHandler];
+    });
+    return sharedInstance;
 }
 
 -(void) setUpDeeplinkHandler {
     
-   BOOL isDeepLinkHandlerSet=  [[NSUserDefaults standardUserDefaults] boolForKey:@"PIODeeplinkHandler"];
+    BOOL isDeepLinkHandlerSet=  [[NSUserDefaults standardUserDefaults] boolForKey:@"PIODeeplinkHandler"];
     if(isDeepLinkHandlerSet) {
         [[PushIOManager sharedInstance] setDeeplinkDelegate:self];
     }
 }
-    
+
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
     FlutterMethodChannel* flutterChannel = [FlutterMethodChannel
-                                     methodChannelWithName:@"pushiomanager_flutter"
-                                     binaryMessenger:[registrar messenger]];
+                                            methodChannelWithName:@"pushiomanager_flutter"
+                                            binaryMessenger:[registrar messenger]];
     
     PushIOManagerFlutterPlugin* instance = [PushIOManagerFlutterPlugin sharedInstance];
     [registrar addMethodCallDelegate:instance channel:flutterChannel];
-
+    
     [registrar addApplicationDelegate:instance];
+    [registrar addSceneDelegate:instance];
+    
+   
     instance.channel = flutterChannel;
     
     if ([UNUserNotificationCenter currentNotificationCenter].delegate == nil) {
@@ -56,14 +54,12 @@ return sharedInstance;
     }
     [[NSNotificationCenter defaultCenter] addObserver:instance selector:@selector(onDeepLinkReceived:) name:PIORsysWebURLResolvedNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:instance selector:@selector(onMessageCenterUpdate:) name:PIOMessageCenterUpdateNotification object:nil];
+
     [instance setup];
 }
 
 - (void)setup {
-
     [PushIOManager sharedInstance].notificationPresentationOptions = UNNotificationPresentationOptionAlert | UNNotificationPresentationOptionBadge | UNNotificationPresentationOptionSound;
-
-
 }
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
     if ([@"getPlatformVersion" isEqualToString:call.method]) {
@@ -71,8 +67,8 @@ return sharedInstance;
     } else if ([@"setDelayRegistration" isEqualToString:call.method]) {
         [self setDelayRegistration:call withResult:result];
     }else if ([@"isDelayRegistration" isEqualToString:call.method]) {
-       [self isDelayRegistration:call withResult:result];
-   } else if ([@"configure" isEqualToString:call.method]) {
+        [self isDelayRegistration:call withResult:result];
+    } else if ([@"configure" isEqualToString:call.method]) {
         [self configure:call withResult:result];
     } else if ([@"registerForAllRemoteNotificationTypes" isEqualToString:call.method]) {
         [self registerForAllRemoteNotificationTypes:call withResult:result];
@@ -84,9 +80,9 @@ return sharedInstance;
         [self setLogLevel:call withResult:result];
     } else if ([@"registerForAllRemoteNotificationTypesWithCategories" isEqualToString:call.method]) {
         [self registerForAllRemoteNotificationTypesWithCategories:call withResult:result];
-        } else if ([@"registerForNotificationAuthorizations" isEqualToString:call.method]) {
-            [self registerForNotificationAuthorizations:call withResult:result];
-        } else if ([@"unregisterApp" isEqualToString:call.method]) {
+    } else if ([@"registerForNotificationAuthorizations" isEqualToString:call.method]) {
+        [self registerForNotificationAuthorizations:call withResult:result];
+    } else if ([@"unregisterApp" isEqualToString:call.method]) {
         [self unregisterApp:call withResult:result];
     } else if ([@"trackEngagement" isEqualToString:call.method]) {
         [self trackEngagement:call withResult:result];
@@ -222,8 +218,57 @@ return sharedInstance;
         [self didEnterBeaconRegion:call withResult:result];
     } else if ([@"onBeaconRegionExited" isEqualToString:call.method]) {
         [self didExitBeaconRegion:call withResult:result];
-    }
-     else {
+    }else if ([@"setMessageCenterEventTrackingEnabled" isEqualToString:call.method]) {
+        [self setMessageCenterEventTrackingEnabled:call withResult:result];
+    }else if ([@"isMessageCenterEventTrackingEnabled" isEqualToString:call.method]) {
+        [self isMessageCenterEventTrackingEnabled:call withResult:result];
+    }else if ([@"trackMessageCenterEventByMessageId" isEqualToString:call.method]) {
+        [self trackMessageCenterEventByMessageId:call withResult:result];
+    }else if([@"trackMessageCenterEventByMessages" isEqualToString:call.method]){
+        [self trackMessageCenterEventByMessages:call withResult:result];
+    }else if ([@"isSDKEnabled" isEqualToString:call.method]) {
+        [self isSDKEnabled:call withResult:result];
+    }else if ([@"setSDKEnabled" isEqualToString:call.method]) {
+        [self setSDKEnabled:call withResult:result];
+    }else if ([@"clearUserId" isEqualToString:call.method]) {
+        [self clearUserId:call withResult:result];
+    }else if ([@"storeUserId" isEqualToString:call.method]) {
+        [self storeUserId:call withResult:result];
+    }else if ([@"storePreference" isEqualToString:call.method]) {
+        [self storePreference:call withResult:result];
+    }else if ([@"deletePreference" isEqualToString:call.method]) {
+        [self deletePreference:call withResult:result];
+    }else if ([@"excludeUserIDForUBI" isEqualToString:call.method]) {
+        [self excludeUserIDForUBI:call withResult:result];
+    }else if ([@"setSecretKey" isEqualToString:call.method]) {
+        [self setSecretKey:call withResult:result];
+    }else if ([@"trackMessageCenterMessageStatus" isEqualToString:call.method]) {
+        [self trackMessageCenterMessageStatus:call withResult:result];
+    }else if ([@"setMCMessageReadStatusEnabled" isEqualToString:call.method]) {
+        [self setMCMessageReadStatusEnabled:call withResult:result];
+    }else if ([@"isMCMessageReadStatusEnabled" isEqualToString:call.method]) {
+        [self isMCMessageReadStatusEnabled:call withResult:result];
+    }else if ([@"getMessageCenterUnreadCount" isEqualToString:call.method]) {
+        [self getMessageCenterUnreadCount:call withResult:result];
+    }else if ([@"setInAppMessageBannerAsModal" isEqualToString:call.method]) {
+        [self setInAppMessageBannerAsModal:call withResult:result];
+    }else if ([@"isInAppMessageBannerModal" isEqualToString:call.method]) {
+        [self isInAppMessageBannerModal:call withResult:result];
+    }else if ([@"isInAppMessageDisplayed" isEqualToString:call.method]) {
+        [self isInAppMessageDisplayed:call withResult:result];
+    }else if ([@"closeInAppMessageView" isEqualToString:call.method]) {
+        [self closeInAppMessageView:call withResult:result];
+    } else if ([@"setInAppMessageVideoAutoPlay" isEqualToString:call.method]) {
+        [self setInAppMessageVideoAutoPlay:call withResult:result];
+    }else if ([@"setInAppMessageVideoAutoDismiss" isEqualToString:call.method]) {
+        [self setInAppMessageVideoAutoDismiss:call withResult:result];
+    }else if ([@"getInAppMessageVideoAutoPlayStatus" isEqualToString:call.method]) {
+        [self getInAppMessageVideoAutoPlayStatus:call withResult:result];
+    }else if ([@"getInAppMessageVideoAutoDismissStatus" isEqualToString:call.method]) {
+        [self getInAppMessageVideoAutoDismissStatus:call withResult:result];
+    }else if ([@"setEngagementId" isEqualToString:call.method]) {
+        [self setEngagementId:call withResult:result];
+    }else {
         result(FlutterMethodNotImplemented);
     }
 }
@@ -246,7 +291,6 @@ return sharedInstance;
 - (void)registerApp:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     NSError *error;
     BOOL useLocation = (BOOL) call.arguments;
-    
     
     [[PushIOManager sharedInstance] registerApp:&error useLocation:useLocation completionHandler:^(NSError *error, NSString *response) {
         [self sendPluginResult:result withResponse:response andError:error];
@@ -294,13 +338,13 @@ return sharedInstance;
     if (value == (id)[NSNull null]) {
         value = nil;
     }
-
+    
     NSInteger authOptions = [value integerValue];
     NSArray *categories = call.arguments[@"categories"];
     if (categories == (id)[NSNull null]) {
         categories = nil;
     }
-
+    
     [[PushIOManager sharedInstance] registerForNotificationAuthorizations:authOptions categories:[categories notificationCategoryArray] completionHandler:^(NSError *error, NSString *response) {
         [self sendPluginResult:result withResponse:response andError:error];
     }];
@@ -321,7 +365,7 @@ return sharedInstance;
     if (filename == (id)[NSNull null]) {
         filename = nil;
     }
-
+    
     NSLog(@"configureWithFilename %@", filename);
     [[PushIOManager sharedInstance] configureWithFileName:filename completionHandler:^(NSError *error, NSString *response) {
         [self sendPluginResult:result withResponse:response andError:error];
@@ -336,21 +380,21 @@ return sharedInstance;
     }
     
     BOOL useLocation = call.arguments[@"userLocation"];
-
-
+    
+    
     NSLog(@"configureWithFilename %@", filename);
     [[PushIOManager sharedInstance] configureWithFileName:filename completionHandler:^(NSError *configError, NSString *response) {
         if(configError != nil) {
             NSLog(@"Unable to configure SDK, reason: %@", configError.description);
             [self sendPluginResult:result withResponse:response andError:configError];
-
+            
             return;
         }
-                
+        
         //5. Register with APNS and request for push permissions
         [[PushIOManager sharedInstance] registerForAllRemoteNotificationTypes:^(NSError *error, NSString *deviceToken) {
             if (nil == error) {
-
+                
                 //Configure other SDK APIs here, if needed eg: [[PushIOManager sharedInstance] registerUserID:@"A1B2C3D4"];
                 
                 //6. Register application with Responsys server. This API is responsible to send registration signal to Responsys server. This API sends all the values configured on SDK to server.
@@ -370,18 +414,18 @@ return sharedInstance;
                 }
             } else {
                 [self sendPluginResult:result withResponse:deviceToken andError:error];
-
+                
             }
         }];
     }];
 }
-                                        
--(void)unregisterApp:(FlutterMethodCall *)call withResult:(FlutterResult)result {
 
-  [[PushIOManager sharedInstance] unregisterApp:nil completionHandler:^(NSError *error, NSString *response) {
-    NSLog(@"React unregisterApp %@",(response ?: @"success"));
-    [self sendPluginResult:result withResponse:response andError:error];
-  }];
+-(void)unregisterApp:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    
+    [[PushIOManager sharedInstance] unregisterApp:nil completionHandler:^(NSError *error, NSString *response) {
+        NSLog(@"React unregisterApp %@",(response ?: @"success"));
+        [self sendPluginResult:result withResponse:response andError:error];
+    }];
 }
 
 -(void)trackEngagement:(FlutterMethodCall *)call withResult:(FlutterResult)result {
@@ -389,15 +433,15 @@ return sharedInstance;
     if (value == (id)[NSNull null]) {
         value = nil;
     }
-  int metric = [value intValue];
-  NSDictionary *properties = call.arguments[@"properties"];
+    int metric = [value intValue];
+    NSDictionary *properties = call.arguments[@"properties"];
     if (properties == (id)[NSNull null]) {
         properties = nil;
     }
-
-  [[PushIOManager sharedInstance] trackEngagementMetric:(int)metric withProperties:properties completionHandler:^(NSError *error, NSString *response) {
-    [self sendPluginResult:result withResponse:response andError:error];
-  }];
+    
+    [[PushIOManager sharedInstance] trackEngagementMetric:(int)metric withProperties:properties completionHandler:^(NSError *error, NSString *response) {
+        [self sendPluginResult:result withResponse:response andError:error];
+    }];
 }
 
 -(void)resetEngagementContext:(FlutterMethodCall *)call withResult:(FlutterResult)result {
@@ -427,10 +471,10 @@ return sharedInstance;
     if (messageCenter == (id)[NSNull null]) {
         messageCenter = nil;
     }
-
+    
     NSMutableDictionary *responseDictionary = [NSMutableDictionary dictionary];
     responseDictionary[@"messageCenter"] = messageCenter;
-
+    
     [[PushIOManager sharedInstance] fetchMessagesForMessageCenter:messageCenter CompletionHandler:^(NSError *error, NSArray *messages) {
         result([messages messageDictionary]);
     }];
@@ -442,18 +486,18 @@ return sharedInstance;
     if (messageID == (id)[NSNull null]) {
         messageID = nil;
     }
-
-  [[PushIOManager sharedInstance] fetchRichContentForMessage:messageID CompletionHandler:^(NSError *error, NSString *messageID, NSString *richContent) {
-      
-      if (error) {
-          result([self flutterError:error]);
-          return;
-      }
-      NSMutableDictionary *responseDictionary = [NSMutableDictionary dictionary];
-      responseDictionary[@"richContent"] = richContent;
-      responseDictionary[@"messageID"] = messageID;
-      result(responseDictionary);
-  }];
+    
+    [[PushIOManager sharedInstance] fetchRichContentForMessage:messageID CompletionHandler:^(NSError *error, NSString *messageID, NSString *richContent) {
+        
+        if (error) {
+            result([self flutterError:error]);
+            return;
+        }
+        NSMutableDictionary *responseDictionary = [NSMutableDictionary dictionary];
+        responseDictionary[@"richContent"] = richContent;
+        responseDictionary[@"messageID"] = messageID;
+        result(responseDictionary);
+    }];
 }
 
 -(void)setInAppFetchEnabled:(FlutterMethodCall *)call withResult:(FlutterResult)result {
@@ -477,7 +521,7 @@ return sharedInstance;
 }
 
 
-                              
+
 -(void)getDeviceID:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     NSString *deviceID = [[PushIOManager sharedInstance] getDeviceID];
     [self sendPluginResult:result withResponse:deviceID andError:nil];
@@ -485,13 +529,13 @@ return sharedInstance;
 
 
 -(void)getEngagementMaxAge:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-  double engagementAge = [[PushIOManager sharedInstance] getEngagementMaxAge];
+    double engagementAge = [[PushIOManager sharedInstance] getEngagementMaxAge];
     result(@(engagementAge));
 }
 
 -(void)getEngagementTimeStamp:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-  NSString *engagementTimeStamp = [[PushIOManager sharedInstance] getEngagementTimeStamp];
-  [self sendPluginResult:result withResponse:engagementTimeStamp andError:nil];
+    NSString *engagementTimeStamp = [[PushIOManager sharedInstance] getEngagementTimeStamp];
+    [self sendPluginResult:result withResponse:engagementTimeStamp andError:nil];
 }
 
 
@@ -505,12 +549,12 @@ return sharedInstance;
     if (key == (id)[NSNull null]) {
         key = nil;
     }
-
+    
     PIOPreference *preference = [[PushIOManager sharedInstance] getPreference:key];
     NSDictionary *jsonDictionary = [NSDictionary dictionaryFromPreference:preference];
     if(jsonDictionary) {
-    NSString *prefrenceJSON = [jsonDictionary JSON];
-       [self sendPluginResult:result withResponse:prefrenceJSON andError:nil];
+        NSString *prefrenceJSON = [jsonDictionary JSON];
+        [self sendPluginResult:result withResponse:prefrenceJSON andError:nil];
     } else {
         [self sendPluginResult:result withResponse:nil andError:nil];
     }
@@ -522,10 +566,10 @@ return sharedInstance;
     NSDictionary *properties = call.arguments[@"properties"];
     if (eventName == (id)[NSNull null]) {
         result([FlutterError errorWithCode:[NSString stringWithFormat:@"%i", (int)00] message:@"Eventname can not be null" details:nil]);
-
+        
         return;
     }
-
+    
     if (properties == (id)[NSNull null]) {
         properties = nil;
     }
@@ -539,10 +583,10 @@ return sharedInstance;
     if (event == (id)[NSNull null]) {
         event = nil;
     }
-
+    
     [[PushIOManager sharedInstance] trackConversionEvent:[event conversionEvent] completionHandler:^(NSError *error, NSString *response) {
         [self sendPluginResult:result withResponse:response andError:error];
-
+        
     }];
 }
 
@@ -561,14 +605,14 @@ return sharedInstance;
         result([FlutterError errorWithCode:[NSString stringWithFormat:@"%i", (int)00] message:@"Preference type can't be NULL. Should be \"STRING\" or \"NUMBER\" or \"BOOLEAN\"" details:nil]);
         return;
     }
-
+    
     int type = ([value isEqualToString:@"STRING"] ? PIOPreferenceTypeString : ([value isEqualToString:@"NUMBER"] ? PIOPreferenceTypeNumeric : PIOPreferenceTypeBoolean)) ;
     NSError *error = nil;
     [[PushIOManager sharedInstance] declarePreference:key label:label type:type error:&error];
     [self sendPluginResult:result withResponse:nil andError:error];
 }
 
-                                        
+
 -(void)setBooleanPreference:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     id value = call.arguments[@"value"];
     if (value == (id)[NSNull null]) {
@@ -578,9 +622,9 @@ return sharedInstance;
     if (key == (id)[NSNull null]) {
         key = nil;
     }
-
-
-  [[PushIOManager sharedInstance] setBoolPreference:[value boolValue] forKey:key];
+    
+    
+    [[PushIOManager sharedInstance] setBoolPreference:[value boolValue] forKey:key];
     [self sendPluginResult:result withResponse:nil andError:nil];
 }
 
@@ -593,7 +637,7 @@ return sharedInstance;
     if (key == (id)[NSNull null]) {
         key = nil;
     }
-
+    
     BOOL successful = [[PushIOManager sharedInstance] setStringPreference:value forKey:key];
     if(successful) {
         [self sendPluginResult:result withResponse:nil andError:nil];
@@ -602,7 +646,7 @@ return sharedInstance;
         NSString *errorMessage =  [NSString stringWithFormat:@"Preference key: %@ value: %@ ignored. Unable to save preference.", key, value];
         NSError *error = [NSError errorWithDomain:@"PIOPreferenceError" code:1001 userInfo:@{NSLocalizedDescriptionKey: NSLocalizedString(errorMessage, nil)}];
         [self sendPluginResult:result withResponse:nil andError:error];
-   
+        
     }
 }
 
@@ -621,13 +665,13 @@ return sharedInstance;
         [self sendPluginResult:result withResponse:nil andError:nil];
     } else {
         
-            NSString *errorMessage =  [NSString stringWithFormat:@"Preference key: %@ value: %@ ignored. Unable to save preference.", key, value];
-            NSError *error = [NSError errorWithDomain:@"PIOPreferenceError" code:1001 userInfo:@{NSLocalizedDescriptionKey: NSLocalizedString(errorMessage, nil)}];
-            [self sendPluginResult:result withResponse:nil andError:error];
-       
+        NSString *errorMessage =  [NSString stringWithFormat:@"Preference key: %@ value: %@ ignored. Unable to save preference.", key, value];
+        NSError *error = [NSError errorWithDomain:@"PIOPreferenceError" code:1001 userInfo:@{NSLocalizedDescriptionKey: NSLocalizedString(errorMessage, nil)}];
+        [self sendPluginResult:result withResponse:nil andError:error];
+        
     }
     
-
+    
 }
 
 -(void)removePreference:(FlutterMethodCall *)call withResult:(FlutterResult)result {
@@ -651,8 +695,8 @@ return sharedInstance;
         [self sendPluginResult:result withResponse:nil andError:[NSError errorWithDomain:@"PIOPreferenceError" code:1001 userInfo:@{NSLocalizedDescriptionKey: NSLocalizedString(@"Unable to clear preferences", nil)}]];
     }
 }
-                                   
-                                       
+
+
 
 
 -(void)setBadgeCount:(FlutterMethodCall *)call withResult:(FlutterResult)result {
@@ -661,10 +705,10 @@ return sharedInstance;
         result([FlutterError errorWithCode:[NSString stringWithFormat:@"%i", (int)00] message:@"Badge Count can't be empty" details:nil]);
         return;
     }
-
+    
     dispatch_async(dispatch_get_main_queue(), ^{
         [[PushIOManager sharedInstance] setBadgeCount:[badgeCount integerValue] completionHandler:^(NSError *error, NSString *response) {
-          [self sendPluginResult:result withResponse:response andError:error];
+            [self sendPluginResult:result withResponse:response andError:error];
         }];
     });
 }
@@ -678,10 +722,10 @@ return sharedInstance;
 }
 
 -(void)getBadgeCount:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-  dispatch_async(dispatch_get_main_queue(), ^{
-      NSInteger badgeCount = [[PushIOManager sharedInstance] getBadgeCount];
-      result(@(badgeCount));
-  });
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSInteger badgeCount = [[PushIOManager sharedInstance] getBadgeCount];
+        result(@(badgeCount));
+    });
 }
 
 
@@ -700,8 +744,8 @@ return sharedInstance;
     if (messageId == (id)[NSNull null]) {
         messageId = nil;
     }
-
-  [[PushIOManager sharedInstance] trackMessageCenterOpenEngagement:messageId];
+    
+    [[PushIOManager sharedInstance] trackMessageCenterOpenEngagement:messageId];
     [self sendPluginResult:result withResponse:nil andError:nil];
 }
 
@@ -710,20 +754,20 @@ return sharedInstance;
     if (messageId == (id)[NSNull null]) {
         messageId = nil;
     }
-
-  [[PushIOManager sharedInstance] trackMessageCenterDisplayEngagement:messageId];
+    
+    [[PushIOManager sharedInstance] trackMessageCenterDisplayEngagement:messageId];
     [self sendPluginResult:result withResponse:nil andError:nil];
-
+    
 }
 
 -(void)onMessageCenterViewVisible:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-  [[PushIOManager sharedInstance] messageCenterViewWillAppear];
+    [[PushIOManager sharedInstance] messageCenterViewWillAppear];
     [self sendPluginResult:result withResponse:nil andError:nil];
-
+    
 }
 
 -(void)onMessageCenterViewFinish:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-  [[PushIOManager sharedInstance] messageCenterViewWillDisappear];
+    [[PushIOManager sharedInstance] messageCenterViewWillDisappear];
     [self sendPluginResult:result withResponse:nil andError:nil];
 }
 
@@ -740,10 +784,10 @@ return sharedInstance;
 -(void)addInteractiveNotificationCategory:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     [self sendPluginResult:result withResponse:nil andError:nil];
 }
-                                         
-                                             
 
-                                         
+
+
+
 -(void)isSDKConfigured:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     BOOL isSDKConfigured = [[PushIOManager sharedInstance] isSDKConfigured];
     result(@(isSDKConfigured));
@@ -813,7 +857,7 @@ return sharedInstance;
     if (executeRsysWebURL == (id)[NSNull null]) {
         executeRsysWebURL = nil;
     }
-
+    
     [[PushIOManager sharedInstance] setExecuteRsysWebURL:[executeRsysWebURL boolValue]];
     [self sendPluginResult:result withResponse:nil andError:nil];
 }
@@ -822,8 +866,8 @@ return sharedInstance;
     result(@([[PushIOManager sharedInstance] executeRsysWebURL]));
 }
 
-                              
-                              //TODO
+
+//TODO
 -(void)setConfigType:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     id value = call.arguments;
     if (value == (id)[NSNull null]) {
@@ -876,44 +920,46 @@ return sharedInstance;
 }
 
 -(void)onDeepLinkReceived:(NSNotification *)notification {
-
+    
     NSMutableDictionary *resolvedURLInfo = [NSMutableDictionary new];
-
+    
     resolvedURLInfo[@"deeplinkUrl"] = notification.userInfo[PIOResolvedDeeplinkURL];
     resolvedURLInfo[@"weblinkUrl"] = notification.userInfo[PIOResolvedWeblinkURL];
     resolvedURLInfo[@"requestUrl"] = notification.userInfo[PIORequestedWebURL];
     resolvedURLInfo[@"isPubwebURLType"] = ([notification.userInfo[PIORequestedWebURLIsPubWebType] boolValue] == YES)? @"YES" : @"NO";
     NSError *error = notification.userInfo[PIOErrorResolveWebURL];
     resolvedURLInfo[@"error"] = error.description;
-
-    [self.channel invokeMethod:@"setIAMUrlResolveLinkHandler" arguments:resolvedURLInfo];
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.channel invokeMethod:@"setIAMUrlResolveLinkHandler" arguments:resolvedURLInfo];
+    });
 }
 
 - (void)setInterceptDeepLink:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-
+    
     id value = call.arguments ;
     if (value == (id)[NSNull null]) {
         value = nil;
     }
-
+    
     if ([value boolValue] == YES) {
         [[PushIOManager sharedInstance] setDeeplinkDelegate:self];
         [[NSUserDefaults standardUserDefaults] setBool:true forKey:@"PIODeeplinkHandler"];
-
+        
     } else {
         [[PushIOManager sharedInstance] setDeeplinkDelegate:nil];
         [[NSUserDefaults standardUserDefaults] setBool:false forKey:@"PIODeeplinkHandler"];
-
+        
     }
-
+    
     [self sendPluginResult:result withResponse:nil andError:nil];
 }
-//
+
 - (BOOL)handleOpenURL:(NSURL *)url {
     if (url == nil) {
         return NO;
     }
-
+    
     BOOL isDeepLinkHandlerSet =  [[NSUserDefaults standardUserDefaults] boolForKey:@"PIODeeplinkHandler"];
     if(isDeepLinkHandlerSet) {
         [self.channel invokeMethod:@"setNotificationDeepLinkHandler" arguments:[url absoluteString]];
@@ -929,7 +975,7 @@ return sharedInstance;
         value = nil;
     }
     [[PushIOManager sharedInstance] setDelayRichPushDisplay:[value boolValue]];
-
+    
     [self sendPluginResult:result withResponse:nil andError:nil];
 }
 
@@ -954,8 +1000,11 @@ return sharedInstance;
         return;
     }
     
-    [[PushIOManager sharedInstance] setInAppMessageCloseButton:closeButton];
-    [[PushIOManager sharedInstance] setInAppDelegate:self];
+    [[PushIOManager sharedInstance] setInAppMessageCloseButton:closeButton];  
+    //[[PushIOManager sharedInstance] setInAppDelegate:self];
+    NSLog(@"%@",[PushIOManager sharedInstance]);
+    NSLog(@"%@", [PushIOManager sharedInstance].inAppDelegate);
+   
     [self sendPluginResult:result withResponse:nil andError:nil];
 }
 
@@ -1016,7 +1065,7 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
 
 
 - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
-
+    
     BOOL isDeepLinkHandlerSet =  [[NSUserDefaults standardUserDefaults] boolForKey:@"PIODeeplinkHandler"];
     if(isDeepLinkHandlerSet) {
         [[PushIOManager sharedInstance] openURL:url options:options];
@@ -1026,8 +1075,22 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
     }
 }
 
+-(BOOL)scene:(UIScene *)scene openURLContexts: (NSSet<UIOpenURLContext *>*)openURLContexts  API_AVAILABLE(ios(13.0)){
+     return [[PushIOManager sharedInstance] openURLContexts:openURLContexts];
+}
+
+-(BOOL)scene:(UIScene *)scene willConnectToSession:(UISceneSession *)session options:(UISceneConnectionOptions *)connectionOptions API_AVAILABLE(ios(13.0)){
+    [[PushIOManager sharedInstance] willConnectToSession:session options:connectionOptions];
+    return true;
+}
+
+-(BOOL)scene:(UIScene *)scene continueUserActivity:(NSUserActivity *)userActivity API_AVAILABLE(ios(13.0)){
+    [[PushIOManager sharedInstance] continueUserActivity:userActivity restorationHandler:nil];
+    return YES;
+}
+
 - (BOOL)application:(UIApplication*)application
-    didFinishLaunchingWithOptions:(NSDictionary*)launchOptions {
+didFinishLaunchingWithOptions:(NSDictionary*)launchOptions {
     
     [[PushIOManager sharedInstance] didFinishLaunchingWithOptions:launchOptions];
     return true;
@@ -1071,9 +1134,9 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
 }
 
 -(void)onMessageCenterUpdate:(NSNotification *)notification {
-
+    
     NSArray *messageCenters =  (NSArray *)[notification object];
-
+    
     if (messageCenters != nil && messageCenters.count > 0){
         NSString *mcString =  [messageCenters componentsJoinedByString:@","];
         [self.channel invokeMethod:@"onMessageCenterUpdate" arguments:mcString];
@@ -1175,9 +1238,249 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
     }];
 }
 
+-(void)setMessageCenterEventTrackingEnabled:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    id value = call.arguments;
+    if (value == (id)[NSNull null]) {
+        value = nil;
+    }
+    BOOL enable = [value boolValue];
+    [[PushIOManager sharedInstance] setMessageCenterEventTrackingEnabled:enable];
+    [self sendPluginResult:result withResponse:nil andError:nil];
+}
+
+-(void)isMessageCenterEventTrackingEnabled:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    
+    result(@([[PushIOManager sharedInstance] isMessageCenterEventTrackingEnabled]));
+}
+
+-(void)trackMessageCenterEventByMessageId:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    PIOMessageCenterEvent mcEvent = -1;
+    
+    id mcEventType = call.arguments[@"messageCenterEvent"];
+    if (! (mcEventType == (id)[NSNull null])) {
+        mcEvent = (PIOMessageCenterEvent)[mcEventType intValue];
+    }
+    
+    NSString *messageId = call.arguments[@"messageID"];
+    if (messageId == (id)[NSNull null]) {
+        messageId = nil;
+    }
+    
+    [[PushIOManager sharedInstance] trackMessageCenterEvent:mcEvent messageId:messageId];
+    [self sendPluginResult:result withResponse:nil andError:nil];
+}
+
+-(void)trackMessageCenterEventByMessages:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    PIOMessageCenterEvent mcEvent = -1;
+    
+    id mcEventType = call.arguments[@"messageCenterEvent"];
+    if (! (mcEventType == (id)[NSNull null])) {
+        mcEvent = (PIOMessageCenterEvent)[mcEventType intValue];
+    }
+    
+    NSArray *messages = call.arguments[@"messages"];
+    if (messages == (id)[NSNull null]) {
+        messages = nil;
+    }
+    
+    [[PushIOManager sharedInstance] trackMessageCenterEvent:mcEvent messages:messages];
+    [self sendPluginResult:result withResponse:nil andError:nil];
+}
+
+-(void)isSDKEnabled:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    
+    result(@([[PushIOManager sharedInstance] isSDKEnabled]));
+}
 
 
-               
+-(void)setSDKEnabled:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    id value = call.arguments;
+    if (value == (id)[NSNull null]) {
+        value = nil;
+    }
+    BOOL enable = [value boolValue];
+    [[PushIOManager sharedInstance] setSDKEnabled:enable];
+}
+
+-(void)clearUserId:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    
+    [[PushIOManager sharedInstance] clearUserId];
+    
+}
+
+-(void)storeUserId:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    NSString *userId = call.arguments;
+    if (userId == (id)[NSNull null]) {
+        userId = nil;
+    }
+    [[PushIOManager sharedInstance] storeUserId:userId];
+}
+
+
+-(void)storePreference:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    
+    NSString *key = call.arguments[@"key"];
+    if (key == (id)[NSNull null]) {
+        key = nil;
+    }
+    
+    NSString *label = call.arguments[@"label"];
+    if (label == (id)[NSNull null]) {
+        label = nil;
+    }
+    
+    NSString *value = call.arguments[@"value"];
+    if (value == (id)[NSNull null]) {
+        value = nil;
+    }
+    
+    id prefsType = call.arguments[@"type"];
+    if (prefsType == (id)[NSNull null]) {
+        result([FlutterError errorWithCode:[NSString stringWithFormat:@"%i", (int)00] message:@"Preference type can't be NULL. Should be \"STRING\" or \"NUMBER\" or \"BOOLEAN\"" details:nil]);
+        return;
+    }
+    
+    int type = ([prefsType isEqualToString:@"STRING"] ? PIOPreferenceTypeString : ([prefsType isEqualToString:@"NUMBER"] ? PIOPreferenceTypeNumeric : PIOPreferenceTypeBoolean)) ;
+    NSError *error = nil;
+    
+    [[PushIOManager sharedInstance] storePreference:key label:label type:type value:value error:&error];
+    [self sendPluginResult:result withResponse:nil andError:error];
+}
+
+-(void)deletePreference:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    NSString *key = call.arguments;
+    if (key == (id)[NSNull null]) {
+        key = nil;
+    }
+    NSError *error = nil;
+    [[PushIOManager sharedInstance] removePreference:key error:&error];
+    [self sendPluginResult:result withResponse:nil andError:error];
+}
+
+
+-(void)excludeUserIDForUBI:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    id value = call.arguments;
+    if (value == (id)[NSNull null]) {
+        value = nil;
+    }
+    BOOL excludeUser = [value boolValue];
+    [[PushIOManager sharedInstance] excludeUserIDForUBI:excludeUser];
+}
+
+-(void)setSecretKey:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    NSString *secretKey = call.arguments;
+    if (secretKey == (id)[NSNull null]) {
+        secretKey = nil;
+    }
+    [[PushIOManager sharedInstance] setSecret:secretKey];
+}
+
+-(void)trackMessageCenterMessageStatus:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    NSString *messageId = call.arguments[@"messageID"];
+    if (messageId == (id)[NSNull null]) {
+        messageId = nil;
+    }
+    
+    BOOL status = [call.arguments[@"status"] boolValue];
+    
+    [[PushIOManager sharedInstance] trackMessageCenterMessageStatus:messageId readStatus:status CompletionHandler:^(NSError * _Nullable error, NSString * _Nullable response) {
+        [self sendPluginResult:result withResponse:response andError:error];
+    }];
+}
+
+-(void)setMCMessageReadStatusEnabled:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    id value = call.arguments;
+    if (value == (id)[NSNull null]) {
+        value = nil;
+    }
+    BOOL enable = [value boolValue];
+    [[PushIOManager sharedInstance] setMCMessageReadStatusEnabled:enable];
+}
+
+-(void)isMCMessageReadStatusEnabled:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    
+    result(@([[PushIOManager sharedInstance] isMCMessageReadStatusEnabled]));
+}
+
+-(void)getMessageCenterUnreadCount:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    
+    NSString *messageCenterName = call.arguments;
+    if (messageCenterName == (id)[NSNull null]) {
+        messageCenterName = nil;
+    }
+    result(@([[PushIOManager sharedInstance] getMessageCenterUnreadCount:messageCenterName]));
+}
+
+
+-(void)setInAppMessageBannerAsModal:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    id value = call.arguments;
+    if (value == (id)[NSNull null]) {
+        value = nil;
+    }
+    BOOL isModal = [value boolValue];
+    [[PushIOManager sharedInstance] setInAppMessageBannerAsModal:isModal];
+}
+
+-(void)isInAppMessageBannerModal:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    
+    result(@([[PushIOManager sharedInstance] isInAppMessageBannerModal]));
+}
+
+
+-(void)isInAppMessageDisplayed:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    
+    result(@([[PushIOManager sharedInstance] isInAppMessageDisplayed]));
+}
+
+
+-(void)closeInAppMessageView:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    
+    result(@([[PushIOManager sharedInstance] closeInAppMessageView]));
+}
+
+-(void)setInAppMessageVideoAutoPlay:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    
+    id value = call.arguments;
+    if (value == (id)[NSNull null]) {
+        value = nil;
+    }
+    BOOL autoPlayEnabled = [value boolValue];
+    
+    result(@([[PushIOManager sharedInstance] setInAppMessageVideoAutoPlay:autoPlayEnabled]));
+}
+
+-(void)setInAppMessageVideoAutoDismiss:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    
+    id value = call.arguments;
+    if (value == (id)[NSNull null]) {
+        value = nil;
+    }
+    BOOL autoDismissEnabled = [value boolValue];
+    
+    result(@([[PushIOManager sharedInstance] setInAppMessageVideoAutoDismiss:autoDismissEnabled]));
+}
+
+-(void)getInAppMessageVideoAutoPlayStatus:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    
+    result(@([[PushIOManager sharedInstance] getInAppMessageVideoAutoPlayStatus]));
+}
+
+-(void)getInAppMessageVideoAutoDismissStatus:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    
+    result(@([[PushIOManager sharedInstance] getInAppMessageVideoAutoDismissStatus]));
+}
+
+
+-(void)setEngagementId:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    NSString *engagementID = call.arguments;
+    if (engagementID == (id)[NSNull null]) {
+        engagementID = nil;
+    }
+    [[PushIOManager sharedInstance] setEngagementID:engagementID];
+}
+
+
+
 @end
 
 

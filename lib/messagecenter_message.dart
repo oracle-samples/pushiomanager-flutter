@@ -1,4 +1,4 @@
-// Copyright © 2024, Oracle and/or its affiliates. All rights reserved.
+// Copyright © 2026, Oracle and/or its affiliates. All rights reserved.
 // Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
 
 class MessageCenterMessage {
@@ -13,6 +13,8 @@ class MessageCenterMessage {
   final String? sentTimestamp;
   final String? expiryTimestamp;
   final Map<String, String>? customKeyValuePairs;
+  final String? readStatus;
+  final String? readStatusTimestamp;
 
   MessageCenterMessage(
       this.messageID,
@@ -25,7 +27,9 @@ class MessageCenterMessage {
       this.richMessageURL,
       this.sentTimestamp,
       this.expiryTimestamp,
-      this.customKeyValuePairs);
+      this.customKeyValuePairs,
+      this.readStatus,
+      this.readStatusTimestamp);
 
   static MessageCenterMessage fromJson(dynamic json) {
     return MessageCenterMessage(
@@ -41,7 +45,9 @@ class MessageCenterMessage {
         json['expiryTimestamp'],
         (json['customKeyValuePairs'] != null)
             ? Map<String, String>.from(json['customKeyValuePairs'])
-            : null);
+            : null,
+        json['readStatus'],
+        json['readStatusTimestamp']);
   }
 
   Map<String, dynamic> toJson() => {
@@ -55,6 +61,8 @@ class MessageCenterMessage {
         'richMessageURL': richMessageURL,
         'sentTimestamp': sentTimestamp,
         'expiryTimestamp': expiryTimestamp,
-        'customKeyValuePairs': customKeyValuePairs
+        'customKeyValuePairs': customKeyValuePairs,
+        'readStatus': readStatus,
+        'readStatusTimestamp': readStatusTimestamp
       };
 }
