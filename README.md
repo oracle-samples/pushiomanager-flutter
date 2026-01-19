@@ -36,7 +36,7 @@ This plugin makes it easy to integrate the Responsys Mobile SDK with your Flutte
 - Android SDK Tools >= 28.0.3
 
 ### For iOS
-- iOS 12 or later
+- iOS 13 or later
 
 <br/>
 
