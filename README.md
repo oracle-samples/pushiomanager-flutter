@@ -30,10 +30,14 @@ This plugin makes it easy to integrate the Responsys Mobile SDK with your Flutte
 
 ## Requirements
 
-- Flutter >= 2.0.3
+- Flutter >= 3.44.0
+- Dart >= 3.12.0
 
 ### For Android
 - Android SDK Tools >= 28.0.3
+- Android API level 24 or later
+- JDK 17
+- Gradle 9.1 or later with Android Gradle Plugin 9.0 or later
 
 ### For iOS
 - iOS 13 or later
@@ -56,10 +60,10 @@ Before installing the plugin, you must setup your app to receive push notificati
 
 	```gradle
 	configurations.maybeCreate("default")
-	artifacts.add("default", file('oracle-cx-mobile-base-7.0.1.aar'))
+	artifacts.add("default", file('oracle-cx-mobile-base-7.1.6.aar'))
 
 	//Optional
-	//artifacts.add("default", file('oracle-cx-mobile-location-7.0.0.aar'))
+	//artifacts.add("default", file('oracle-cx-mobile-location-7.1.0.aar'))
 	```		
 
 - Add the following to your project-wide `settings.gradle` file:
@@ -157,13 +161,24 @@ and run `flutter pub get` from command-line.
 - Open the `build.gradle` file located in `android/app/` and add the following dependency,
 	
 	```gradle
-	implementation 'com.google.firebase:firebase-messaging:18.0.0' 
+	implementation 'com.google.firebase:firebase-messaging:25.0.1'
 	```
 	
 	**NOTE**: If your app uses the native `firebase-messaging` library version 21.0.0 or later, it is required to add the following dependency as well,
 	
 	```gradle
 	implementation 'com.google.android.gms:play-services-base:16.1.0' 
+	```
+
+- SDK 7.1.4.5 and later encrypt the Message Center database. Add the required
+  database runtime dependencies to `android/app/build.gradle`:
+
+	```gradle
+	implementation 'androidx.security:security-crypto:1.1.0'
+	implementation 'net.zetetic:sqlcipher-android:4.14.1'
+	implementation 'androidx.sqlite:sqlite:2.6.2'
+	implementation 'androidx.room:room-runtime:2.8.4'
+	annotationProcessor 'androidx.room:room-compiler:2.8.4'
 	```
 
 - Open the `AndroidManifest.xml` file located in `android/app/src/main` and add the following,

@@ -4,16 +4,17 @@
 name: pushiomanager_flutter
 description: Flutter plugin for Responsys Mobile SDK
 
-version: 7.1.5
+version: 7.1.6
 repository: https://github.com/oracle-samples/pushiomanager-flutter
 
 environment:
-  sdk: '>=2.14.0 <4.0.0'
+  sdk: ^3.12.0
+  flutter: ">=3.44.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  flutter_plugin_android_lifecycle: ^2.0.22
+  flutter_plugin_android_lifecycle: ^2.0.35
 
 dev_dependencies:
   flutter_test:

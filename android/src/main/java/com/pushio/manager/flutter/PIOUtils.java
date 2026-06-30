@@ -95,10 +95,13 @@ public class PIOUtils {
             messageMap.put("iconURL", message.getIconUrl());
             messageMap.put("messageCenterName", message.getMessageCenterName());
             messageMap.put("deeplinkURL", message.getDeeplinkUrl());
+            messageMap.put("richMessageHTML", message.getRichMessageHtml());
             messageMap.put("richMessageURL", message.getRichMessageUrl());
             messageMap.put("sentTimestamp", getDateAsString(message.getSentTimestamp()));
             messageMap.put("expiryTimestamp", getDateAsString(message.getExpiryTimestamp()));
             messageMap.put("customKeyValuePairs", message.getCustomKeyValue());
+            messageMap.put("readStatus", message.isRead() ? "R" : "U");
+            messageMap.put("readStatusTimestamp", message.getReadTimestamp());
 
             messageList.add(messageMap);
         }

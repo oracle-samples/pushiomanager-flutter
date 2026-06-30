@@ -40,7 +40,9 @@ import com.pushio.manager.PIOLogger;
 import com.pushio.manager.PIOMCMessage;
 import com.pushio.manager.PIOMCMessageError;
 import com.pushio.manager.PIOMCMessageListener;
+import com.pushio.manager.PIOMCMessageStatusListener;
 import com.pushio.manager.PIOMCRichContentListener;
+import com.pushio.manager.PIOMessageCenterEvent;
 import com.pushio.manager.PIORegionCompletionListener;
 import com.pushio.manager.PIORegionEventType;
 import com.pushio.manager.PIORegionException;
@@ -55,6 +57,7 @@ import com.pushio.manager.tasks.PushIOListener;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -79,6 +82,7 @@ public class PushIOManagerFlutterPlugin
     private Handler mUIThreadHandler = new Handler(Looper.getMainLooper());
     private SharedPreferences mPreferences;
     private Intent launchIntent;
+    private PIOMessageCenterUpdateListener mMessageCenterUpdateListener;
 
     @Override
     public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
@@ -87,6 +91,7 @@ public class PushIOManagerFlutterPlugin
         mContext = flutterPluginBinding.getApplicationContext();
 
         mPushIOManager = PushIOManager.getInstance(mContext);
+        registerMessageCenterUpdateListener();
 
         mPreferences = mContext.getSharedPreferences("pushio-flutter", Activity.MODE_PRIVATE);
 
@@ -151,6 +156,10 @@ public class PushIOManagerFlutterPlugin
     @Override
     public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
         PIOLogger.v("FL oDFE");
+        if (mPushIOManager != null && mMessageCenterUpdateListener != null) {
+            mPushIOManager.removeMessageCenterUpdateListener(mMessageCenterUpdateListener);
+            mMessageCenterUpdateListener = null;
+        }
         channel.setMethodCallHandler(null);
     }
 
@@ -1103,13 +1112,18 @@ public class PushIOManagerFlutterPlugin
         result.success(isStatusBarHidden);
     }
 
-    private void onMessageCenterUpdate(Intent intent) {
-        mPushIOManager.addMessageCenterUpdateListener(new PIOMessageCenterUpdateListener() {
+    private void registerMessageCenterUpdateListener() {
+        mMessageCenterUpdateListener = new PIOMessageCenterUpdateListener() {
             @Override
             public void onUpdate(List<String> messages) {
-                channel.invokeMethod("onMessageCenterUpdate", String.join(", ", messages));
+                mUIThreadHandler.post(() -> {
+                    if (channel != null) {
+                        channel.invokeMethod("onMessageCenterUpdate", String.join(", ", messages));
+                    }
+                });
             }
-        });
+        };
+        mPushIOManager.addMessageCenterUpdateListener(mMessageCenterUpdateListener);
     }
 
     private void setInAppCustomCloseButton(MethodCall call, Result result) {
@@ -1138,5 +1152,274 @@ public class PushIOManagerFlutterPlugin
         }
 
         result.success(null);
+    }
+
+    private void setMessageCenterEventTrackingEnabled(MethodCall call, Result result) {
+        mPushIOManager.setMessageCenterEventTrackingEnabled((Boolean) call.arguments());
+        result.success(null);
+    }
+
+    private void isMessageCenterEventTrackingEnabled(MethodCall call, Result result) {
+        result.success(mPushIOManager.isMessageCenterEventTrackingEnabled());
+    }
+
+    private void trackMessageCenterEventByMessageId(MethodCall call, Result result) {
+        final PIOMessageCenterEvent event = messageCenterEventFromCall(call, result);
+        final String messageId = call.argument("messageID");
+        if (event == null || TextUtils.isEmpty(messageId)) {
+            if (event != null) {
+                result.error("INVALID_ARGUMENT", "Message ID is required", null);
+            }
+            return;
+        }
+
+        mPushIOManager.trackMessageCenterEvent(event, messageId);
+        result.success(null);
+    }
+
+    private void trackMessageCenterEventByMessages(MethodCall call, Result result) {
+        final PIOMessageCenterEvent event = messageCenterEventFromCall(call, result);
+        if (event == null) {
+            return;
+        }
+
+        final List<Map<String, Object>> messages = call.argument("messages");
+        if (messages == null) {
+            result.error("INVALID_ARGUMENT", "Messages are required", null);
+            return;
+        }
+
+        // The SDK's list overload only uses PIOMCMessage IDs. Dart cannot construct
+        // PIOMCMessage instances because their setters are package-private, so call
+        // the equivalent message-ID overload for each serialized message.
+        for (Map<String, Object> message : messages) {
+            final Object messageId = message.get("messageID");
+            if (messageId instanceof String && !TextUtils.isEmpty((String) messageId)) {
+                mPushIOManager.trackMessageCenterEvent(event, (String) messageId);
+            }
+        }
+        result.success(null);
+    }
+
+    private PIOMessageCenterEvent messageCenterEventFromCall(MethodCall call, Result result) {
+        final Integer eventIndex = call.argument("messageCenterEvent");
+        final PIOMessageCenterEvent[] events = PIOMessageCenterEvent.values();
+        if (eventIndex == null || eventIndex < 0 || eventIndex >= events.length) {
+            result.error("INVALID_ARGUMENT", "Invalid Message Center event", null);
+            return null;
+        }
+        return events[eventIndex];
+    }
+
+    private void setSDKEnabled(MethodCall call, Result result) {
+        mPushIOManager.setSDKEnabled((Boolean) call.arguments());
+        result.success(null);
+    }
+
+    private void isSDKEnabled(MethodCall call, Result result) {
+        result.success(mPushIOManager.isSDKEnabled());
+    }
+
+    private void clearUserId(MethodCall call, Result result) {
+        mPushIOManager.clearUserId();
+        result.success(null);
+    }
+
+    private void storeUserId(MethodCall call, Result result) {
+        final String userId = call.arguments();
+        if (TextUtils.isEmpty(userId)) {
+            result.error("INVALID_ARGUMENT", "User ID is required", null);
+            return;
+        }
+        mPushIOManager.storeUserId(userId);
+        result.success(null);
+    }
+
+    private void storePreference(MethodCall call, Result result) {
+        final String key = call.argument("key");
+        final String label = call.argument("label");
+        final String typeName = call.argument("type");
+        final Object value = call.argument("value");
+
+        try {
+            final PushIOPreference.Type type = PushIOPreference.Type.valueOf(typeName);
+            mPushIOManager.storePreference(key, label, type, value);
+            result.success(null);
+        } catch (IllegalArgumentException | NullPointerException e) {
+            result.error("INVALID_ARGUMENT", "Invalid preference type", null);
+        } catch (ValidationException e) {
+            result.error("VALIDATION_ERROR", e.getMessage(), null);
+        }
+    }
+
+    private void deletePreference(MethodCall call, Result result) {
+        final String key = call.arguments();
+        if (TextUtils.isEmpty(key)) {
+            result.error("INVALID_ARGUMENT", "Preference key is required", null);
+            return;
+        }
+        mPushIOManager.deletePreference(key);
+        result.success(null);
+    }
+
+    private void excludeUserIDForUBI(MethodCall call, Result result) {
+        mPushIOManager.excludeUserIdFromUBI((Boolean) call.arguments());
+        result.success(null);
+    }
+
+    private void isUserIDExcludedFromUBI(MethodCall call, Result result) {
+        result.success(mPushIOManager.getExcludeUserIdFromUBI());
+    }
+
+    private void setSecretKey(MethodCall call, Result result) {
+        final String secret = call.arguments();
+        if (TextUtils.isEmpty(secret)) {
+            result.error("INVALID_ARGUMENT", "Secret key is required", null);
+            return;
+        }
+        result.success(mPushIOManager.setSecret(secret));
+    }
+
+    private void trackMessageCenterMessageStatus(MethodCall call, final Result result) {
+        final String messageId = call.argument("messageID");
+        final Boolean readStatus = call.argument("status");
+        if (TextUtils.isEmpty(messageId) || readStatus == null) {
+            result.error("INVALID_ARGUMENT", "Message ID and read status are required", null);
+            return;
+        }
+        if (!mPushIOManager.isMCMessageReadStatusEnabled()) {
+            result.error("FEATURE_DISABLED",
+                    "Enable Message Center read status before tracking message status", null);
+            return;
+        }
+
+        mPushIOManager.trackMessageCenterMessageStatus(messageId, readStatus,
+                new PIOMCMessageStatusListener() {
+                    @Override
+                    public void onSuccess() {
+                        mUIThreadHandler.post(() -> result.success(null));
+                    }
+
+                    @Override
+                    public void onFailure(String failedMessageId, String errorMessage) {
+                        mUIThreadHandler.post(() -> result.error(
+                                "MESSAGE_STATUS_ERROR", errorMessage, failedMessageId));
+                    }
+                });
+    }
+
+    private void setMCMessageReadStatusEnabled(MethodCall call, Result result) {
+        mPushIOManager.setMCMessageReadStatusEnabled((Boolean) call.arguments());
+        result.success(null);
+    }
+
+    private void isMCMessageReadStatusEnabled(MethodCall call, Result result) {
+        result.success(mPushIOManager.isMCMessageReadStatusEnabled());
+    }
+
+    private void getMessageCenterUnreadCount(MethodCall call, final Result result) {
+        final String messageCenter = call.arguments();
+        if (TextUtils.isEmpty(messageCenter)) {
+            result.error("INVALID_ARGUMENT", "Message Center name is required", null);
+            return;
+        }
+        mPushIOManager.getMessageCenterUnreadCount(messageCenter,
+                count -> mUIThreadHandler.post(() -> result.success(count)));
+    }
+
+    private void setInAppMessageBannerAsModal(MethodCall call, Result result) {
+        mPushIOManager.setIAMBannerAsModal((Boolean) call.arguments());
+        result.success(null);
+    }
+
+    private void isInAppMessageBannerModal(MethodCall call, Result result) {
+        result.success(mPushIOManager.isIAMBannerModal());
+    }
+
+    private void isInAppMessageDisplayed(MethodCall call, Result result) {
+        result.success(mPushIOManager.isIAMDisplayed());
+    }
+
+    private void closeInAppMessageView(MethodCall call, Result result) {
+        result.success(mPushIOManager.closeInAppMessageWindow());
+    }
+
+    private void setInAppMessageVideoAutoPlay(MethodCall call, Result result) {
+        mPushIOManager.setIAMVideoAutoPlay((Boolean) call.arguments());
+        result.success(null);
+    }
+
+    private void setInAppMessageVideoAutoDismiss(MethodCall call, Result result) {
+        mPushIOManager.setIAMVideoAutoDismiss((Boolean) call.arguments());
+        result.success(null);
+    }
+
+    private void getInAppMessageVideoAutoPlayStatus(MethodCall call, Result result) {
+        result.success(mPushIOManager.isIAMVideoAutoPlayEnabled());
+    }
+
+    private void getInAppMessageVideoAutoDismissStatus(MethodCall call, Result result) {
+        result.success(mPushIOManager.isIAMVideoAutoDismissEnabled());
+    }
+
+    private void setEngagementId(MethodCall call, Result result) {
+        final String engagementId = call.arguments();
+        if (TextUtils.isEmpty(engagementId)) {
+            result.error("INVALID_ARGUMENT", "Engagement ID is required", null);
+            return;
+        }
+        final Intent intent = new Intent();
+        intent.putExtra(PushIOManager.PUSHIO_ENGAGEMENTID_KEY, engagementId);
+        mPushIOManager.setEngagementId(intent);
+        result.success(null);
+    }
+
+    private void setReferences(MethodCall call, Result result) {
+        final List<String> references = call.arguments();
+        if (references == null) {
+            result.error("INVALID_ARGUMENT", "References are required", null);
+            return;
+        }
+        mPushIOManager.setReferences(new ArrayList<>(references));
+        result.success(null);
+    }
+
+    private void setReference(MethodCall call, Result result) {
+        final String reference = call.arguments();
+        if (TextUtils.isEmpty(reference)) {
+            result.error("INVALID_ARGUMENT", "Reference is required", null);
+            return;
+        }
+        mPushIOManager.setReference(reference);
+        result.success(null);
+    }
+
+    private void removeReference(MethodCall call, Result result) {
+        final String reference = call.arguments();
+        if (TextUtils.isEmpty(reference)) {
+            result.error("INVALID_ARGUMENT", "Reference is required", null);
+            return;
+        }
+        mPushIOManager.removeReference(reference);
+        result.success(null);
+    }
+
+    private void removeAllReferences(MethodCall call, Result result) {
+        mPushIOManager.removeAllReferences();
+        result.success(null);
+    }
+
+    private void setCurrentActiveReference(MethodCall call, Result result) {
+        final String reference = call.arguments();
+        if (TextUtils.isEmpty(reference)) {
+            result.error("INVALID_ARGUMENT", "Reference is required", null);
+            return;
+        }
+        mPushIOManager.setCurrentActiveReference(reference);
+        result.success(null);
+    }
+
+    private void getCurrentActiveReference(MethodCall call, Result result) {
+        result.success(mPushIOManager.getCurrentActiveReference());
     }
 }
