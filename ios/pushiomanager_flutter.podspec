@@ -6,7 +6,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'pushiomanager_flutter'
-  s.version          = '7.1.5'
+  s.version          = '7.1.4'
   s.summary          = 'Flutter Plugin for Responsys Mobile SDK'
   s.description      = 'Flutter Plugin for Responsys Mobile SDK'
   s.homepage         = 'https://github.com/oracle-samples/pushiomanager-flutter'
