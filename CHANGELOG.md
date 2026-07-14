@@ -1,5 +1,5 @@
-## 7.1.5
-- Upgraded for compatibility with Responsys SDK 7.1.5
+## 7.1.4
+- Upgraded for compatibility with Responsys SDK 7.1.4
 
 ## 7.0.0
 - This version merges the functionality of Responsys, CX Core and CX Analytics SDKs. 
