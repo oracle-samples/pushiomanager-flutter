@@ -8,13 +8,13 @@ Pod::Spec.new do |s|
         s.license                 = { :file => '../LICENSE.txt' }
    	s.source                  = { :git => "https://github.com/pushio/PushIOManager_iOS", :tag => s.version.to_s }
 
-   	s.module_name             = "PushIOManager"
+   	s.module_name             = "CXMobileSDK"
 
    	s.ios.deployment_target   = "12.0"
    	s.requires_arc            =  true
 
-   	s.vendored_frameworks 	  = "PushIOManager.xcframework"
-    s.preserve_paths 	  = "PushIOManager.xcframework/**/*"
+   	s.vendored_frameworks 	  = "CXMobileSDK.xcframework"
+    s.preserve_paths 	  = "CXMobileSDK.xcframework/**/*"
    	
    	s.libraries               = 'sqlite3'
    	s.frameworks              = 'UserNotifications', 'CoreLocation', 'Foundation', 'UIKit'
