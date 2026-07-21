@@ -1,5 +1,5 @@
 /**
-* Copyright © 2025, Oracle and/or its affiliates. All rights reserved.
+* Copyright © 2026, Oracle and/or its affiliates. All rights reserved.
 *
 * Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
 */
@@ -49,6 +49,7 @@ return sharedInstance;
     [registrar addMethodCallDelegate:instance channel:flutterChannel];
 
     [registrar addApplicationDelegate:instance];
+    [registrar addSceneDelegate:instance];
     instance.channel = flutterChannel;
     
     if ([UNUserNotificationCenter currentNotificationCenter].delegate == nil) {
@@ -895,7 +896,9 @@ return sharedInstance;
     NSError *error = notification.userInfo[PIOErrorResolveWebURL];
     resolvedURLInfo[@"error"] = error.description;
 
-    [self.channel invokeMethod:@"setIAMUrlResolveLinkHandler" arguments:resolvedURLInfo];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.channel invokeMethod:@"setIAMUrlResolveLinkHandler" arguments:resolvedURLInfo];
+    });
 }
 
 - (void)setInterceptDeepLink:(FlutterMethodCall *)call withResult:(FlutterResult)result {
@@ -964,7 +967,7 @@ return sharedInstance;
     }
     
     [[PushIOManager sharedInstance] setInAppMessageCloseButton:closeButton];
-    [[PushIOManager sharedInstance] setInAppDelegate:self];
+    //[[PushIOManager sharedInstance] setInAppDelegate:self];
     [self sendPluginResult:result withResponse:nil andError:nil];
 }
 
@@ -1033,6 +1036,20 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
     }else{
         return NO;
     }
+}
+
+-(BOOL)scene:(UIScene *)scene openURLContexts: (NSSet<UIOpenURLContext *>*)openURLContexts  API_AVAILABLE(ios(13.0)){
+     return [[PushIOManager sharedInstance] openURLContexts:openURLContexts];
+}
+
+-(BOOL)scene:(UIScene *)scene willConnectToSession:(UISceneSession *)session options:(UISceneConnectionOptions *)connectionOptions API_AVAILABLE(ios(13.0)){
+    [[PushIOManager sharedInstance] willConnectToSession:session options:connectionOptions];
+    return true;
+}
+
+-(BOOL)scene:(UIScene *)scene continueUserActivity:(NSUserActivity *)userActivity API_AVAILABLE(ios(13.0)){
+    [[PushIOManager sharedInstance] continueUserActivity:userActivity restorationHandler:nil];
+    return YES;
 }
 
 - (BOOL)application:(UIApplication*)application
