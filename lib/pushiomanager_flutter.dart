@@ -1,4 +1,4 @@
-// Copyright © 2024, Oracle and/or its affiliates. All rights reserved.
+// Copyright © 2026, Oracle and/or its affiliates. All rights reserved.
 // Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
 
 // ignore_for_file: await_only_futures
@@ -363,11 +363,7 @@ class PushIOManager {
   }
 
   static Future<void> setDeviceToken(String deviceToken) async {
-    if (Platform.isAndroid) {
-      return await _channel.invokeMethod('setDeviceToken', deviceToken);
-    } else {
-      throw PlatformException(code: "API not supported");
-    }
+    return await _channel.invokeMethod('setDeviceToken', deviceToken);
   }
 
   static Future<void> setMessageCenterBadgingEnabled(bool isEnabled) async {

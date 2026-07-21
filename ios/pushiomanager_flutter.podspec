@@ -1,4 +1,4 @@
-# Copyright © 2024, Oracle and/or its affiliates. All rights reserved.
+# Copyright © 2026, Oracle and/or its affiliates. All rights reserved.
 # Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
 
 # To learn more about a Podspec see http://guides.cocoapods.org/syntax/podspec.html.
@@ -6,7 +6,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'pushiomanager_flutter'
-  s.version          = '7.0.0'
+  s.version          = '7.0.1'
   s.summary          = 'Flutter Plugin for Responsys Mobile SDK'
   s.description      = 'Flutter Plugin for Responsys Mobile SDK'
   s.homepage         = 'https://github.com/oracle-samples/pushiomanager-flutter'

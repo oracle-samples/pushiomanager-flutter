@@ -1,5 +1,5 @@
 /**
-* Copyright © 2024, Oracle and/or its affiliates. All rights reserved.
+* Copyright © 2026, Oracle and/or its affiliates. All rights reserved.
 *
 * Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
 */
@@ -49,6 +49,7 @@ return sharedInstance;
     [registrar addMethodCallDelegate:instance channel:flutterChannel];
 
     [registrar addApplicationDelegate:instance];
+    [registrar addSceneDelegate:instance];
     instance.channel = flutterChannel;
     
     if ([UNUserNotificationCenter currentNotificationCenter].delegate == nil) {
@@ -222,6 +223,8 @@ return sharedInstance;
         [self didEnterBeaconRegion:call withResult:result];
     } else if ([@"onBeaconRegionExited" isEqualToString:call.method]) {
         [self didExitBeaconRegion:call withResult:result];
+    } else if ([@"setDeviceToken" isEqualToString:call.method]) {
+        [self setDeviceToken:call withResult:result];
     }
      else {
         result(FlutterMethodNotImplemented);
@@ -244,19 +247,26 @@ return sharedInstance;
 }
 
 - (void)registerApp:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    NSError *error;
-    BOOL useLocation = (BOOL) call.arguments;
     
     
-    [[PushIOManager sharedInstance] registerApp:&error useLocation:useLocation completionHandler:^(NSError *error, NSString *response) {
-        [self sendPluginResult:result withResponse:response andError:error];
-    }];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSError *regError = nil;
+        BOOL useLocation = (BOOL) call.arguments;
+        [[PushIOManager sharedInstance] registerApp:&regError useLocation:useLocation completionHandler:^(NSError *error, NSString *response) {
+            [self sendPluginResult:result withResponse:response andError:error];
+        }];
+    });
 }
 
 - (void)registerForAllRemoteNotificationTypes:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    [[PushIOManager sharedInstance] registerForAllRemoteNotificationTypes:^(NSError *error, NSString *response) {
-        [self sendPluginResult:result withResponse:response andError:error];
-    }];
+    
+    dispatch_async(dispatch_get_main_queue(), ^(void) {
+        [[PushIOManager sharedInstance] registerForAllRemoteNotificationTypes:^(NSError *error, NSString *response) {
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                [self sendPluginResult:result withResponse:response andError:error];
+            });
+        }];
+    });
 }
 
 - (void)registerForAllRemoteNotificationTypesWithCategories:(FlutterMethodCall *)call withResult:(FlutterResult)result {
@@ -886,7 +896,9 @@ return sharedInstance;
     NSError *error = notification.userInfo[PIOErrorResolveWebURL];
     resolvedURLInfo[@"error"] = error.description;
 
-    [self.channel invokeMethod:@"setIAMUrlResolveLinkHandler" arguments:resolvedURLInfo];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.channel invokeMethod:@"setIAMUrlResolveLinkHandler" arguments:resolvedURLInfo];
+    });
 }
 
 - (void)setInterceptDeepLink:(FlutterMethodCall *)call withResult:(FlutterResult)result {
@@ -955,7 +967,7 @@ return sharedInstance;
     }
     
     [[PushIOManager sharedInstance] setInAppMessageCloseButton:closeButton];
-    [[PushIOManager sharedInstance] setInAppDelegate:self];
+    //[[PushIOManager sharedInstance] setInAppDelegate:self];
     [self sendPluginResult:result withResponse:nil andError:nil];
 }
 
@@ -1024,6 +1036,20 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
     }else{
         return NO;
     }
+}
+
+-(BOOL)scene:(UIScene *)scene openURLContexts: (NSSet<UIOpenURLContext *>*)openURLContexts  API_AVAILABLE(ios(13.0)){
+     return [[PushIOManager sharedInstance] openURLContexts:openURLContexts];
+}
+
+-(BOOL)scene:(UIScene *)scene willConnectToSession:(UISceneSession *)session options:(UISceneConnectionOptions *)connectionOptions API_AVAILABLE(ios(13.0)){
+    [[PushIOManager sharedInstance] willConnectToSession:session options:connectionOptions];
+    return true;
+}
+
+-(BOOL)scene:(UIScene *)scene continueUserActivity:(NSUserActivity *)userActivity API_AVAILABLE(ios(13.0)){
+    [[PushIOManager sharedInstance] continueUserActivity:userActivity restorationHandler:nil];
+    return YES;
 }
 
 - (BOOL)application:(UIApplication*)application
@@ -1173,6 +1199,20 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
         }
         
     }];
+}
+
+-(void)setDeviceToken:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    id value = call.arguments;
+    if (value == (id)[NSNull null]) {
+        value = nil;
+    }
+    NSString *deviceToken = value; 
+    if(deviceToken != nil) {
+        [[PushIOManager sharedInstance] didRegisterForRemoteNotificationsWithDeviceToken:deviceToken];
+        [self sendPluginResult:result withResponse:nil andError:nil];
+    } else {
+        [self sendPluginResult:result withResponse:nil andError:nil];
+    }
 }
 
 
