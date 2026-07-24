@@ -6,24 +6,19 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:pushiomanager_flutter/pushiomanager_flutter.dart';
 
 void main() {
-  const channel = MethodChannel('pushiomanager_flutter');
-  final calls = <MethodCall>[];
+  const MethodChannel channel = MethodChannel('pushiomanager_flutter');
 
   TestWidgetsFlutterBinding.ensureInitialized();
 
   setUp(() {
-    calls.clear();
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockMethodCallHandler(channel, (methodCall) async {
-      calls.add(methodCall);
-      switch (methodCall.method) {
-        case 'getLibVersion':
-          return '7.1.6';
-        case 'isSDKEnabled':
-        case 'isUserIDExcludedFromUBI':
-          return true;
-        default:
-          return null;
+        .setMockMethodCallHandler(channel, (MethodCall methodCall) async {
+      if (methodCall.method == 'getLibVersion') {
+        return '7.1.6';
+      } else if (methodCall.method == 'getAPIKey') {
+        return null;
+      } else {
+        return null;
       }
     });
   });
@@ -33,29 +28,23 @@ void main() {
         .setMockMethodCallHandler(channel, null);
   });
 
-  test('reads SDK metadata', () async {
+  test('getPlatformVersion', () async {
     expect(await PushIOManager.getLibVersion(), '7.1.6');
-    expect(await PushIOManager.getAPIKey(), isNull);
-    expect(await PushIOManager.getAccountToken(), isNull);
   });
 
-  test('returns typed Android feature flags', () async {
-    expect(await PushIOManager.isSDKEnabled(), isTrue);
-    expect(await PushIOManager.isUserIDExcludedFromUBI(), isTrue);
+  test('getAPIKey', () async {
+    expect(await PushIOManager.getAPIKey(), null);
   });
 
-  test('sends multiple-reference values over the channel', () async {
-    await PushIOManager.setReferences(['card-1', 'card-2']);
-    await PushIOManager.setCurrentActiveReference('card-2');
-
-    expect(calls[0].method, 'setReferences');
-    expect(calls[0].arguments, ['card-1', 'card-2']);
-    expect(calls[1].method, 'setCurrentActiveReference');
-    expect(calls[1].arguments, 'card-2');
+  test('getAccountToken', () async {
+    expect(await PushIOManager.getAccountToken(), null);
   });
 
-  test('returns null for missing preferences', () async {
-    expect(await PushIOManager.getPreferences(), isNull);
-    expect(await PushIOManager.getPreference('key'), isNull);
+  test('getPreferences', () async {
+    expect(await PushIOManager.getPreferences(), null);
+  });
+
+  test('getPreference', () async {
+    expect(await PushIOManager.getPreference("key"), null);
   });
 }

@@ -1,10 +1,6 @@
 ## 7.1.6
 - Added Android support for Responsys SDK 7.1.6 APIs.
-- Updated the minimum supported SDK versions to Flutter 3.44 and Dart 3.12.
-- Migrated Android builds to Gradle 9.1, AGP 9.0, built-in Kotlin, and Java 17.
-
-## 7.1.5
-- Upgraded for compatibility with Responsys SDK 7.1.5
+- Migrated Android builds to Gradle 9.1, AGP 9.0, and Java 17.
 
 ## 7.0.0
 - This version merges the functionality of Responsys, CX Core and CX Analytics SDKs. 

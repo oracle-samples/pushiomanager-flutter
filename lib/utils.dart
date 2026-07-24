@@ -87,23 +87,4 @@ int loglevelToInt(LogLevel logLevel) {
   } else {
     return -1;
   }
-
-}
-
-int messageCenterEventToInt(PIOMessageCenterEvent type) {
-  switch (type) {
-    case PIOMessageCenterEvent.PIO_MC_MSG_RECEIVED_BY_APP:
-      return 0;
-    case PIOMessageCenterEvent.PIO_MC_MSG_SAVED_TO_APP_CACHE:
-      return 1;
-    case PIOMessageCenterEvent.PIO_MC_MSG_READ_FROM_APP_CACHE:
-      return 2;
-    default:
-      return -1;
-  }
-}
-
-PIOMessageCenterEvent messageCenterEventFromInt(int type) {
-  return PIOMessageCenterEvent.values
-      .singleWhere((element) => messageCenterEventToInt(element) == type);
 }
