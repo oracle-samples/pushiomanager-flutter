@@ -6,5 +6,5 @@
 
 #import <Flutter/Flutter.h>
 
-@interface PushIOManagerFlutterPlugin : NSObject<FlutterPlugin,FlutterSceneLifeCycleDelegate> 
+@interface PushIOManagerFlutterPlugin : NSObject<FlutterPlugin,FlutterSceneLifeCycleDelegate>
 @end

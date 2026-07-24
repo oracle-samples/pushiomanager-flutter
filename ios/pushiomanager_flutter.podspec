@@ -6,7 +6,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'pushiomanager_flutter'
-  s.version          = '7.1.5'
+  s.version          = '7.0.1'
   s.summary          = 'Flutter Plugin for Responsys Mobile SDK'
   s.description      = 'Flutter Plugin for Responsys Mobile SDK'
   s.homepage         = 'https://github.com/oracle-samples/pushiomanager-flutter'
@@ -16,15 +16,15 @@ Pod::Spec.new do |s|
   s.source_files = 'Classes/**/*'
   s.public_header_files = 'Classes/**/*.h'
   s.dependency 'Flutter'
-  s.platform = :ios, '13.0'
-  s.preserve_paths = 'CXMobileSDK.xcframework'
-  s.xcconfig = { 'OTHER_LDFLAGS' => '-framework CXMobileSDK -ObjC' }
-  s.vendored_frameworks = 'CXMobileSDK.xcframework','OracleCXLocationSDK.xcframework'
-  s.preserve_paths 	  = "CXMobileSDK.xcframework/**/*","OracleCXLocationSDK.xcframework/**/*"
+  s.platform = :ios, '12.0'
+  s.preserve_paths = 'CX_Mobile_SDK.xcframework'
+  s.xcconfig = { 'OTHER_LDFLAGS' => '-framework CX_Mobile_SDK -ObjC' }
+  s.vendored_frameworks = 'CX_Mobile_SDK.xcframework','OracleCXLocationSDK.xcframework'
+  s.preserve_paths 	  = "CX_Mobile_SDK.xcframework/**/*","OracleCXLocationSDK.xcframework/**/*"
   s.libraries               = 'sqlite3'
   s.frameworks              = 'UserNotifications', 'Foundation', 'UIKit'
   s.ios.frameworks          = 'WebKit'
 
   # Flutter.framework does not contain a i386 slice.
-  #s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386 arm64','OTHER_LDFLAGS' => '-ObjC' }
+  s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386 arm64','OTHER_LDFLAGS' => '-ObjC' }
 end

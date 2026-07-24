@@ -39,8 +39,8 @@ Icon?
 PushIOManager.xcframework
 PushIOManager.xcframework/*
 
-CXMobileSDK.xcframework
-CXMobileSDK.xcframework/*
+CX_Mobile_SDK.xcframework
+CX_Mobile_SDK.xcframework/*
 
 OracleCXLocationSDK.xcframework
 OracleCXLocationSDK.xcframework/*

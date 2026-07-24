@@ -412,11 +412,7 @@ class PushIOManager {
   }
 
   static Future<void> setDeviceToken(String deviceToken) async {
-    if (Platform.isAndroid) {
-      return await _channel.invokeMethod('setDeviceToken', deviceToken);
-    } else {
-      throw PlatformException(code: "API not supported");
-    }
+    return await _channel.invokeMethod('setDeviceToken', deviceToken);
   }
 
   static Future<void> setMessageCenterBadgingEnabled(bool isEnabled) async {
