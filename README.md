@@ -482,8 +482,9 @@ PushIOManager.setNotificationDeepLinkHandler((String url) {
 .catchError((error) => print("DeepLink url is not present: $error"));
 
 ```
+## Upgrade
 
-
+For iOS applications upgrading to version 7.0.1, see [iOS SceneDelegate Support in 7.0.1](https://github.com/oracle-samples/pushiomanager-flutter/wiki/Upgrade-to-7.0.1).
 
 ## Support
 
