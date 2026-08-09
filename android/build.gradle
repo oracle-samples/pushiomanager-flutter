@@ -1,8 +1,8 @@
 // Copyright © 2026, Oracle and/or its affiliates. All rights reserved.
 // Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
 
-group 'com.pushio.manager.flutter'
-version '7.0.1'
+group = 'com.pushio.manager.flutter'
+version = '7.1.6'
 
 buildscript {
     repositories {
@@ -11,7 +11,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.4.2'
+        classpath 'com.android.tools.build:gradle:9.0.1'
     }
 }
 
@@ -25,24 +25,29 @@ rootProject.allprojects {
 apply plugin: 'com.android.library'
 
 dependencies {
-    compileOnly 'com.google.firebase:firebase-messaging:18.0.0'
+    compileOnly 'com.google.firebase:firebase-messaging:25.0.1'
     implementation project(":PushIOManager")
-    implementation "androidx.work:work-runtime:2.9.0"
-    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
-    implementation 'com.android.support:support-annotations:28.0.0'
-    implementation 'org.jetbrains:annotations:15.0'
+    implementation "androidx.work:work-runtime:2.11.2"
+    implementation 'androidx.annotation:annotation:1.9.1'
+    implementation 'androidx.security:security-crypto:1.1.0'
+    implementation 'net.zetetic:sqlcipher-android:4.14.1'
+    implementation 'androidx.sqlite:sqlite:2.6.2'
+    implementation 'androidx.room:room-runtime:2.8.4'
 }
 
 android {
 
-    if (project.android.hasProperty("namespace")) {
-        namespace 'com.pushio.manager.flutter'
-    }
+    namespace = 'com.pushio.manager.flutter'
 
-    compileSdkVersion 34
+    compileSdk = 36
 
     defaultConfig {
-        minSdkVersion 21
-        targetSdkVersion 34
+        minSdk = 24
+        targetSdk = 35
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 }

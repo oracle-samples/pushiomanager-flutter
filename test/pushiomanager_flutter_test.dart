@@ -11,9 +11,10 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   setUp(() {
-    channel.setMockMethodCallHandler((MethodCall methodCall) async {
-      if (methodCall.method == 'getPlatformVersion') {
-        return PushIOManager.getLibVersion();
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(channel, (MethodCall methodCall) async {
+      if (methodCall.method == 'getLibVersion') {
+        return '7.1.6';
       } else if (methodCall.method == 'getAPIKey') {
         return null;
       } else {
@@ -23,11 +24,12 @@ void main() {
   });
 
   tearDown(() {
-    channel.setMockMethodCallHandler(null);
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(channel, null);
   });
 
   test('getPlatformVersion', () async {
-    expect(await PushIOManager.getLibVersion(), '6.48');
+    expect(await PushIOManager.getLibVersion(), '7.1.6');
   });
 
   test('getAPIKey', () async {

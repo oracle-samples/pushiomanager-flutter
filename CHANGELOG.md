@@ -1,3 +1,7 @@
+## 7.1.6
+- Added Android support for Responsys SDK 7.1.6 APIs.
+- Migrated Android builds to Gradle 9.1, AGP 9.0, and Java 17.
+
 ## 7.0.0
 - This version merges the functionality of Responsys, CX Core and CX Analytics SDKs. 
 IMPORTANT: Please check the Upgrade documentation on how to integrate this new version
