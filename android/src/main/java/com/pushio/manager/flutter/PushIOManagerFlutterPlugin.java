@@ -21,9 +21,9 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.DefaultLifecycleObserver;
 import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.OnLifecycleEvent;
-import androidx.lifecycle.LifecycleObserver;
+import androidx.lifecycle.LifecycleOwner;
 
 import com.google.firebase.messaging.RemoteMessage;
 import com.pushio.manager.PIOBadgeSyncListener;
@@ -71,7 +71,7 @@ import io.flutter.embedding.engine.plugins.FlutterPlugin.FlutterPluginBinding;
 import io.flutter.embedding.engine.plugins.lifecycle.FlutterLifecycleAdapter;
 
 public class PushIOManagerFlutterPlugin
-        implements FlutterPlugin, MethodCallHandler, NewIntentListener, ActivityAware, LifecycleObserver {
+        implements FlutterPlugin, MethodCallHandler, NewIntentListener, ActivityAware, DefaultLifecycleObserver {
     private MethodChannel channel;
     private PushIOManager mPushIOManager;
     private Context mContext;
@@ -193,8 +193,8 @@ public class PushIOManagerFlutterPlugin
         }
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
-    private void notifyApp() {
+    @Override
+    public void onResume(@NonNull LifecycleOwner owner) {
 
         mUIThreadHandler.postDelayed(new Runnable() {
             @Override
@@ -1071,6 +1071,11 @@ public class PushIOManagerFlutterPlugin
                         channel.invokeMethod("setAppOpenLinkHandler", response);
                     }
                 });
+            }
+
+            @Override
+            public void onFailure(String reason) {
+                PIOLogger.v("FL tEC onFailure: " + reason);
             }
         });
     }

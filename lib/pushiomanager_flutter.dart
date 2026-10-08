@@ -37,6 +37,12 @@ enum EngagementType {
   OTHER
 }
 
+enum PIOMessageCenterEvent {
+  PIO_MC_MSG_RECEIVED_BY_APP,
+  PIO_MC_MSG_SAVED_TO_APP_CACHE,
+  PIO_MC_MSG_READ_FROM_APP_CACHE
+}
+
 enum LogLevel { NONE, ERROR, WARN, INFO, DEBUG, VERBOSE }
 
 class PushIOManager {
@@ -644,5 +650,129 @@ class PushIOManager {
       PIOInAppCloseButton customCloseButton) async {
     return await _channel.invokeMethod(
         'setInAppCustomCloseButton', customCloseButton.toJson());
+  }
+
+  static Future<void> setMessageCenterEventTrackingEnabled(
+      bool isEnabled) async {
+    return await _channel.invokeMethod(
+        'setMessageCenterEventTrackingEnabled', isEnabled);
+  }
+
+  static Future<void> isMessageCenterEventTrackingEnabled() async {
+    return await _channel.invokeMethod('isMessageCenterEventTrackingEnabled');
+  }
+
+  static Future<void> trackMessageCenterEventByMessageId(
+      PIOMessageCenterEvent messageCenterEvent, String messageID) async {
+    int mcEvent = messageCenterEventToInt(messageCenterEvent);
+
+    return await _channel.invokeMethod('trackMessageCenterEventByMessageId',
+        {'messageCenterEvent': mcEvent, 'messageID': messageID});
+  }
+
+  static Future<void> trackMessageCenterEventByMessages(
+      PIOMessageCenterEvent messageCenterEvent,
+      List<MessageCenterMessage> messages) async {
+    int mcEvent = messageCenterEventToInt(messageCenterEvent);
+
+    return await _channel.invokeMethod('trackMessageCenterEventByMessages',
+        {'messageCenterEvent': mcEvent, 'messages': messages});
+  }
+
+  static Future<void> isSDKEnabled() async {
+    return await _channel.invokeMethod('isSDKEnabled');
+  }
+
+  static Future<void> setSDKEnabled(bool isEnabled) async {
+    return await _channel.invokeMethod('setSDKEnabled', isEnabled);
+  }
+
+  static Future<void> clearUserId() async {
+    return await _channel.invokeMethod('clearUserId');
+  }
+
+  static Future<void> storeUserId(String userId) async {
+    return await _channel.invokeMethod('storeUserId', userId);
+  }
+
+  static Future<void> storePreference(
+      String key, String label, String value, PreferenceType type) async {
+    return await _channel.invokeMethod('storePreference', {
+      'key': key,
+      'label': label,
+      'value': value,
+      'type': preferenceTypeToString(type)
+    });
+  }
+
+  static Future<void> excludeUserIDForUBI(bool excludeUserId) async {
+    return await _channel.invokeMethod('excludeUserIDForUBI', excludeUserId);
+  }
+
+  static Future<void> setSecretKey(String? secretKey) async {
+    return await _channel.invokeMethod('setSecretKey', secretKey);
+  }
+
+  static Future<void> deletePreference(String key) async {
+    return await _channel.invokeMethod('deletePreference', key);
+  }
+
+  static Future<void> trackMessageCenterMessageStatus(
+      String messageID, bool readStatus) async {
+    return await _channel.invokeMethod('trackMessageCenterMessageStatus',
+        {'messageID': messageID, 'status': readStatus});
+  }
+
+  static Future<void> setMCMessageReadStatusEnabled(bool enable) async {
+    return await _channel.invokeMethod('setMCMessageReadStatusEnabled', enable);
+  }
+
+  static Future<void> isMCMessageReadStatusEnabled() async {
+    return await _channel.invokeMethod('isMCMessageReadStatusEnabled');
+  }
+
+  static Future<int> getMessageCenterUnreadCount(
+      String messageCenterName) async {
+    return await _channel.invokeMethod(
+        'getMessageCenterUnreadCount', messageCenterName);
+  }
+
+  static Future<void> setInAppMessageBannerAsModal(
+      bool enableBannerAsModal) async {
+    return await _channel.invokeMethod(
+        'setInAppMessageBannerAsModal', enableBannerAsModal);
+  }
+
+  static Future<void> isInAppMessageBannerModal() async {
+    return await _channel.invokeMethod('isInAppMessageBannerModal');
+  }
+
+  static Future<bool> isInAppMessageDisplayed() async {
+    return await _channel.invokeMethod('isInAppMessageDisplayed');
+  }
+
+  static Future<void> closeInAppMessageView() async {
+    return await _channel.invokeMethod('closeInAppMessageView');
+  }
+
+  static Future<void> setInAppMessageVideoAutoPlay(bool enable) async {
+    return await _channel.invokeMethod('setInAppMessageVideoAutoPlay', enable);
+  }
+
+  static Future<void> setInAppMessageVideoAutoDismiss(bool enable) async {
+    return await _channel.invokeMethod(
+        'setInAppMessageVideoAutoDismiss', enable);
+  }
+
+  static Future<void> getInAppMessageVideoAutoPlayStatus() async {
+    return await _channel.invokeMethod('getInAppMessageVideoAutoPlayStatus');
+  }
+
+  static Future<void> getInAppMessageVideoAutoDismissStatus() async {
+    return await _channel.invokeMethod('getInAppMessageVideoAutoDismissStatus');
+  }
+
+  static Future<void> setEngagementId(String engagementId) async {
+    return await _channel.invokeMethod('setEngagementId', engagementId);
   }
 }
