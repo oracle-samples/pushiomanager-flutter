@@ -8,19 +8,21 @@ Pod::Spec.new do |s|
   s.name             = 'pushiomanager_flutter'
   s.version          = '7.1.5'
   s.summary          = 'Flutter Plugin for Responsys Mobile SDK'
-  s.description      = 'Flutter Plugin for Responsys Mobile SDK'
+  s.description      = 'Integrates the Responsys Mobile SDK with Flutter applications on iOS and Android'
   s.homepage         = 'https://github.com/oracle-samples/pushiomanager-flutter'
-  s.license          = { :file => '../LICENSE.txt' }
+  s.license          = { :type => 'UPL-1.0', :file => '../LICENSE.txt' }
   s.author           = { 'Oracle Corp.' => 'neerhaj.joshi@oracle.com' }
   s.source           = { :path => '.' }
-  s.source_files = 'Classes/**/*'
-  s.public_header_files = 'Classes/**/*.h'
+  # Keep CocoaPods and Swift Package Manager on the same plugin sources.
+  s.source_files = 'pushiomanager_flutter/Sources/pushiomanager_flutter/include/souces/**/*.{h,m}'
+  s.public_header_files = 'pushiomanager_flutter/Sources/pushiomanager_flutter/include/souces/**/*.h'
   s.dependency 'Flutter'
   s.platform = :ios, '13.0'
-  s.preserve_paths = 'CXMobileSDK.xcframework'
   s.xcconfig = { 'OTHER_LDFLAGS' => '-framework CXMobileSDK -ObjC' }
-  s.vendored_frameworks = 'CXMobileSDK.xcframework','OracleCXLocationSDK.xcframework'
-  s.preserve_paths 	  = "CXMobileSDK.xcframework/**/*","OracleCXLocationSDK.xcframework/**/*"
+  s.vendored_frameworks = 'pushiomanager_flutter/CXMobileSDK.xcframework'
+  s.preserve_paths = [
+    'pushiomanager_flutter/CXMobileSDK.xcframework/**/*',
+  ]
   s.libraries               = 'sqlite3'
   s.frameworks              = 'UserNotifications', 'Foundation', 'UIKit'
   s.ios.frameworks          = 'WebKit'
